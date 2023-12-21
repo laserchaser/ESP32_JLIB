@@ -4808,9 +4808,9 @@ typedef bool (*DMX512_hal_error_check_rx_overflow_t)(void);
  *
  * DESCRIPTION:
  *  Hardware abstraction layer function template for a user-provided function
- *  which will check if the break error interrupt flag was triggered. This is not
- *  really an error in DMX context, but is expected, and needed, to operate
- *  correctly. We expect each new received packet to be preceeded with  a break
+ *  which will check if the break error interrupt flag was triggered. This is not 
+ *  really an error in DMX context, but is expected, and needed, to operate 
+ *  correctly. We expect each new received packet to be preceeded with  a break 
  *  which will trigger a break interrupt.
  *
  * RETURN:
@@ -5006,6 +5006,23 @@ typedef void (*DMX512_hal_disable_dma_t)(void);
  *  Points to the data structure which is currently being modified or
  *  utilized for a transaction.
  *
+ * break_us
+ *  Time, in microseconds, that the line is held low for the "break" portion of
+ *  the protocol. This value is defaulted at initialization, but can be modified 
+ *  by the user to suit their timing needs.
+ * 
+ * mark_after_break_us
+ *  Time, in microseconds, that the line is held high for the "MAB" portion of
+ *  the protocol. This value is defaulted at initialization, but can be modified 
+ *  by the user to suit their timing needs.
+ * 
+ * tx_post_timeout_us
+ *  Time, in microseconds, that the alrogithm times out after completely sending
+ *  the DMX data to the UART peripheral before starting the break condition. 
+ *  This is intended to provide sufficient time for the peripheral to completely
+ *  finish transmitting the Tx data. This value is defaulted at initialization,
+ *  but can be modified by the user to suit their timing needs.
+ *
  * dmx_byte_counter
  *  Keeps track of the number of received/transmitted DMX bytes during
  *  non-DMA transfers.
@@ -5030,6 +5047,9 @@ typedef struct
   DMX512_transaction_buffers_t* transaction_buffers;
   DMX512_transaction_t* stable;
   DMX512_transaction_t* working;
+  uint16_t break_us;
+  uint16_t mark_after_break_us;
+  uint16_t tx_post_timeout_us;
   uint16_t dmx_byte_counter;
   uint32_t callback_context;
   bool (*service_handler)(void*);
