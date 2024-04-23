@@ -4517,8 +4517,12 @@ DMX512_transaction_t;
  * DMX512_transaction_buffers_t
  *
  * DESCRIPTION:
- *  A dual-buffer system is used to allow a stable buffer to be available to
- *  the user while a working buffer is manipulated.
+ *  A three buffer system is used to support working versus stable data and DMX
+ *  channel data versus other non-channel data (RDM, TEXT, etc...). At any time
+ *  only one of the buffers is the "working" buffer. The other two are stable
+ *  buffers, one for DMX and the other for all other types of data. This setup
+ *  assumes that DMX channel data will be most prevelant, and that all other
+ *  data types can share a single double buffer.
  *
  * transaction
  *  See DMX512_transaction_t
@@ -4527,7 +4531,7 @@ DMX512_transaction_t;
 
 typedef struct
 {
-  DMX512_transaction_t transaction[2];
+  DMX512_transaction_t transaction[3];
 }
 DMX512_transaction_buffers_t;
 
@@ -4991,20 +4995,24 @@ typedef void (*DMX512_hal_disable_dma_t)(void);
  * utimer_ticket
  *  Data structure used with the UTIMER instance.
  *
- * transaction
- *  Data for a single DMX transaction. Setup as an array of two data structures
- *  to allow a ping-pong effect between stable and working data.
- *
  * transaction_buffers
  *  Pointer to a user provided buffer, of size DMX512_transaction_buffers_t,
  *  which is DMA compatible and will provide buffering for all transactions.
  *
+ * stable_dmx
+ *  Points to the last completed and stable DMX data transaction data structure.
+ * 
+ * stable_other
+ *  Points to the last completed and stable non-DMX data (RDM, TEXT, etc...) 
+ *  transaction data structure.
+ * 
  * stable
- *  Points to the last completed and stable transaction data structure.
+ *  Points to the last completed data transaction data structure, either the
+ *  stable_dmx or stable_other.
  *
  * working
- *  Points to the data structure which is currently being modified or
- *  utilized for a transaction.
+ *  Points to the data structure which is currently being modified or utilized
+ *  for a transaction.
  *
  * break_us
  *  Time, in microseconds, that the line is held low for the "break" portion of
@@ -5045,6 +5053,8 @@ typedef struct
   UTIMER_instance_t* utimer;
   volatile UTIMER_ticket_t utimer_ticket;
   DMX512_transaction_buffers_t* transaction_buffers;
+  DMX512_transaction_t* stable_dmx;
+  DMX512_transaction_t* stable_other;
   DMX512_transaction_t* stable;
   DMX512_transaction_t* working;
   uint16_t break_us;
