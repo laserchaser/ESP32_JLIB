@@ -9007,6 +9007,7 @@ extern "C" {
 
 #ifdef PRINT_TERMINAL_QUEUE
 #define PCHAR(Z)                PRINT_char(&PRINT_TERMINAL_QUEUE, Z)
+#define PMSTR(Z, M)             PRINT_mstring(&PRINT_TERMINAL_QUEUE, Z, M)
 #define PSTR(Z)                 PRINT_string(&PRINT_TERMINAL_QUEUE, Z)
 #define PU32(Z)                 PRINT_uint32(&PRINT_TERMINAL_QUEUE, Z)
 #define PI32(Z)                 PRINT_int32(&PRINT_TERMINAL_QUEUE, Z)
@@ -9022,6 +9023,7 @@ extern "C" {
 #define PCLEAR()                PRINT_clear(&PRINT_TERMINAL_QUEUE)
 #else
 #define PCHAR(Z)
+#define PMSTR(Z, M)
 #define PSTR(Z)
 #define PU32(Z)
 #define PI32(Z)
@@ -9044,8 +9046,9 @@ extern "C" {
  * DESCRIPTION:
  *  Enqueues a single ASCII character.
  *
- * value
- *  ASCII characters to enqueue.
+ * PARAMETERS:
+ *  value
+ *   ASCII characters to enqueue.
  *
  ******************************************************************************/
 
@@ -9059,12 +9062,32 @@ void PRINT_char(QUEUE_instance_t* instance, char value);
  *  Enqueues an array of ASCII characters, a string, until a null character is
  *  reached.
  *
- * value
- *  ASCII characters to enqueue.
+ * PARAMETERS:
+ *  value
+ *   ASCII characters to enqueue.
  *
  ******************************************************************************/
 
 void PRINT_string(QUEUE_instance_t* instance, char* value);
+
+/*******************************************************************************
+ *
+ * PRINT_mstring
+ *
+ * DESCRIPTION:
+ *  Enqueues an array of ASCII characters, a string, until a null character or
+ *  maximum length is reached.
+ *
+ * PARAMETERS:
+ *  value
+ *   ASCII characters to enqueue.
+ *
+ *  length
+ *   Maximum number of characters to print if a null character is not reached.
+ *
+ ******************************************************************************/
+
+void PRINT_mstring(QUEUE_instance_t* instance, char* value, uint32_t length);
 
 /*******************************************************************************
  *
@@ -9073,8 +9096,9 @@ void PRINT_string(QUEUE_instance_t* instance, char* value);
  * DESCRIPTION:
  *  Enqueues the ASCII representation of the provided uint32_t.
  *
- * value
- *  Value to translate to ASCII characters and enqueue.
+ * PARAMETERS:
+ *  value
+ *   Value to translate to ASCII characters and enqueue.
  *
  ******************************************************************************/
 
@@ -9087,8 +9111,9 @@ void PRINT_uint32(QUEUE_instance_t* instance, uint32_t value);
  * DESCRIPTION:
  *  Enqueues the ASCII representation of the provided int32_t.
  *
- * value
- *  Value to translate to ASCII characters and enqueue.
+ * PARAMETERS:
+ *  value
+ *   Value to translate to ASCII characters and enqueue.
  *
  ******************************************************************************/
 
@@ -9101,8 +9126,9 @@ void PRINT_int32(QUEUE_instance_t* instance, int32_t value);
  * DESCRIPTION:
  *  Enqueues the ASCII representation of the provided uint64_t.
  *
- * value
- *  Value to translate to ASCII characters and enqueue.
+ * PARAMETERS:
+ *  value
+ *   Value to translate to ASCII characters and enqueue.
  *
  ******************************************************************************/
 
@@ -9115,8 +9141,9 @@ void PRINT_uint64(QUEUE_instance_t* instance, uint64_t value);
  * DESCRIPTION:
  *  Enqueues the ASCII representation of the provided int64_t.
  *
- * value
- *  Value to translate to ASCII characters and enqueue.
+ * PARAMETERS:
+ *  value
+ *   Value to translate to ASCII characters and enqueue.
  *
  ******************************************************************************/
 
@@ -9130,8 +9157,9 @@ void PRINT_int64(QUEUE_instance_t* instance, int64_t value);
  *  Enqueues the ASCII representation of the provided uint8_t in hex-decimal
  *  format. The output will contain 1-characters.
  *
- * value
- *  Value to translate to ASCII character and enqueue.
+ * PARAMETERS:
+ *  value
+ *   Value to translate to ASCII character and enqueue.
  *
  ******************************************************************************/
 
@@ -9145,8 +9173,9 @@ void PRINT_hex4(QUEUE_instance_t* instance, uint8_t value);
  *  Enqueues the ASCII representation of the provided uint8_t in hex-decimal
  *  format. The output will contain 2-characters.
  *
- * value
- *  Value to translate to ASCII characters and enqueue.
+ * PARAMETERS:
+ *  value
+ *   Value to translate to ASCII characters and enqueue.
  *
  ******************************************************************************/
 
@@ -9160,8 +9189,9 @@ void PRINT_hex8(QUEUE_instance_t* instance, uint8_t value);
  *  Enqueues the ASCII representation of the provided uint16_t in hex-decimal
  *  format. The output will contain 4-characters.
  *
- * value
- *  Value to translate to ASCII characters and enqueue.
+ * PARAMETERS:
+ *  value
+ *   Value to translate to ASCII characters and enqueue.
  *
  ******************************************************************************/
 
@@ -9175,8 +9205,9 @@ void PRINT_hex16(QUEUE_instance_t* instance, uint16_t value);
  *  Enqueues the ASCII representation of the provided uint32_t in hex-decimal
  *  format. The output will contain 8-characters.
  *
- * value
- *  Value to translate to ASCII characters and enqueue.
+ * PARAMETERS:
+ *  value
+ *   Value to translate to ASCII characters and enqueue.
  *
  ******************************************************************************/
 
@@ -9190,8 +9221,9 @@ void PRINT_hex32(QUEUE_instance_t* instance, uint32_t value);
  *  Enqueues the ASCII representation of the provided uint8_t in binary
  *  format. The output will contain 4-characters.
  *
- * value
- *  Value to translate to ASCII characters and enqueue.
+ * PARAMETERS:
+ *  value
+ *   Value to translate to ASCII characters and enqueue.
  *
  ******************************************************************************/
 
@@ -9205,8 +9237,9 @@ void PRINT_bin4(QUEUE_instance_t* instance, uint8_t value);
  *  Enqueues the ASCII representation of the provided uint8_t in binary
  *  format. The output will contain 8-characters.
  *
- * value
- *  Value to translate to ASCII characters and enqueue.
+ * PARAMETERS:
+ *  value
+ *   Value to translate to ASCII characters and enqueue.
  *
  ******************************************************************************/
 
@@ -9220,8 +9253,9 @@ void PRINT_bin8(QUEUE_instance_t* instance, uint8_t value);
  *  Enqueues the ASCII representation of the provided uint16_t in binary
  *  format. The output will contain 16-characters.
  *
- * value
- *  Value to translate to ASCII characters and enqueue.
+ * PARAMETERS:
+ *  value
+ *   Value to translate to ASCII characters and enqueue.
  *
  ******************************************************************************/
 
@@ -9235,8 +9269,9 @@ void PRINT_bin16(QUEUE_instance_t* instance, uint16_t value);
  *  Enqueues the ASCII representation of the provided uint32_t in binary
  *  format. The output will contain 32-characters.
  *
- * value
- *  Value to translate to ASCII characters and enqueue.
+ * PARAMETERS:
+ *  value
+ *   Value to translate to ASCII characters and enqueue.
  *
  ******************************************************************************/
 
@@ -11078,6 +11113,30 @@ int8_t UTILITIES_memcmp(void* a_addr, void* b_addr, uint32_t length);
  ******************************************************************************/
 
 uint32_t UTILITIES_strlen(char* str);
+
+/*******************************************************************************
+ *
+ * UTILITIES_strnlen
+ *
+ * DESCRIPTION:
+ *  Lite alternative for strlen_s in the string library. Counts the number of
+ *  characters up to, but not including, the NULL terminator or until a maximum
+ *  length is reached.
+ *
+ * PARAMETERS:
+ *  str
+ *   Input string.
+ *
+ *  length
+ *   Maximum characters to compare.
+ *
+ * RETURN:
+ *  The number of characters up to, but not including, the NULL terminator or
+ *  the maximum length if no NULL terminator is reached.
+ *
+ ******************************************************************************/
+
+uint32_t UTILITIES_strnlen(char* str, uint32_t length);
 
 /*******************************************************************************
  *
