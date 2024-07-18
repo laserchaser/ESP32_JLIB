@@ -857,7 +857,7 @@ typedef uint8_t (*SERI2C_hal_read_rx_register_t)(void);
  *
  ******************************************************************************/
 
-typedef void (*SERI2C_hal_write_tx_register_t)(uint8_t value);
+typedef void (*SERI2C_hal_write_tx_register_t)(uint8_t);
 
 /*******************************************************************************
  *
@@ -1150,7 +1150,7 @@ typedef void (*SERI2C_hal_clear_errors_t)(void);
  *
  ******************************************************************************/
 
-typedef void (*SERI2C_hal_enable_rx_t)(bool last_byte);
+typedef void (*SERI2C_hal_enable_rx_t)(bool);
 
 /*******************************************************************************
  *
@@ -1643,8 +1643,7 @@ SERI2CSLAVE_error_flags_t;
  *
  ******************************************************************************/
 
-typedef void (*SERI2CSLAVE_master_read_from_slave_callback_t)(uint8_t* value,
-                                                              uint32_t bytes_read_from_slave);
+typedef void (*SERI2CSLAVE_master_read_from_slave_callback_t)(uint8_t*, uint32_t);
 
 
 /*******************************************************************************
@@ -1669,8 +1668,7 @@ typedef void (*SERI2CSLAVE_master_read_from_slave_callback_t)(uint8_t* value,
  *
  ******************************************************************************/
 
-typedef bool (*SERI2CSLAVE_master_write_to_slave_callback_t)(uint8_t* value,
-                                                             uint32_t bytes_written_to_slave);
+typedef bool (*SERI2CSLAVE_master_write_to_slave_callback_t)(uint8_t*, uint32_t);
 
 /*******************************************************************************
  *
@@ -1731,7 +1729,7 @@ typedef uint8_t (*SERI2CSLAVE_hal_read_rx_register_t)(void);
  *
  ******************************************************************************/
 
-typedef void (*SERI2CSLAVE_hal_write_tx_register_t)(uint8_t value);
+typedef void (*SERI2CSLAVE_hal_write_tx_register_t)(uint8_t);
 
 /*******************************************************************************
  *
@@ -2235,7 +2233,7 @@ typedef uint32_t (*SERSPI_hal_read_rx_register_t)(void);
  *
  ******************************************************************************/
 
-typedef void (*SERSPI_hal_write_tx_register_t)(uint32_t value);
+typedef void (*SERSPI_hal_write_tx_register_t)(uint32_t);
 
 /*******************************************************************************
  *
@@ -2368,7 +2366,7 @@ typedef void (*SERSPI_hal_new_task_reset_t)(void);
  *
  ******************************************************************************/
 
-typedef void (*SERSPI_hal_burst_write_mosi_buffer_t)(uint8_t* buffer, uint32_t length);
+typedef void (*SERSPI_hal_burst_write_mosi_buffer_t)(uint8_t*, uint32_t);
 
 /*******************************************************************************
  *
@@ -2396,7 +2394,7 @@ typedef void (*SERSPI_hal_burst_write_mosi_buffer_t)(uint8_t* buffer, uint32_t l
  *
  ******************************************************************************/
 
-typedef void (*SERSPI_hal_burst_write_mosi_buffer_dummy_t)(uint32_t length, uint32_t offset);
+typedef void (*SERSPI_hal_burst_write_mosi_buffer_dummy_t)(uint32_t, uint32_t);
 
 /*******************************************************************************
  *
@@ -2422,7 +2420,7 @@ typedef void (*SERSPI_hal_burst_write_mosi_buffer_dummy_t)(uint32_t length, uint
  *
  ******************************************************************************/
 
-typedef void (*SERSPI_hal_burst_read_miso_buffer_t)(uint8_t* buffer, uint32_t length);
+typedef void (*SERSPI_hal_burst_read_miso_buffer_t)(uint8_t*, uint32_t);
 
 /*******************************************************************************
  *
@@ -2443,7 +2441,7 @@ typedef void (*SERSPI_hal_burst_read_miso_buffer_t)(uint8_t* buffer, uint32_t le
  *
  ******************************************************************************/
 
-typedef void (*SERSPI_hal_burst_set_length_t)(uint32_t length);
+typedef void (*SERSPI_hal_burst_set_length_t)(uint32_t);
 
 /*******************************************************************************
  *
@@ -2997,7 +2995,7 @@ typedef uint16_t (*SERUART_hal_read_rx_register_t)(void);
  *
  ******************************************************************************/
 
-typedef void (*SERUART_hal_write_tx_register_t)(uint16_t value);
+typedef void (*SERUART_hal_write_tx_register_t)(uint16_t);
 
 /*******************************************************************************
  *
@@ -3961,7 +3959,7 @@ extern "C" {
  *
  ******************************************************************************/
 
-typedef bool (*BUSQUEUE_task_callback_t)(uint32_t context);
+typedef bool (*BUSQUEUE_task_callback_t)(uint32_t);
 
 /*******************************************************************************
  *
@@ -4630,7 +4628,7 @@ typedef void (*DMX512_transmit_complete_callback_t)(DMX512_transaction_t*);
  *
  ******************************************************************************/
 
-typedef void (*DMX512_pre_task_callback_t)(uint32_t context);
+typedef void (*DMX512_pre_task_callback_t)(uint32_t);
 
 /*******************************************************************************
  *
@@ -4649,7 +4647,7 @@ typedef void (*DMX512_pre_task_callback_t)(uint32_t context);
  *
  ******************************************************************************/
 
-typedef void (*DMX512_post_task_callback_t)(uint32_t context);
+typedef void (*DMX512_post_task_callback_t)(uint32_t);
 
 /*******************************************************************************
  *
@@ -4669,7 +4667,7 @@ typedef void (*DMX512_post_task_callback_t)(uint32_t context);
  *
  ******************************************************************************/
 
-typedef void (*DMX512_hal_set_dmx_direction_t)(DMX512_mode_t mode);
+typedef void (*DMX512_hal_set_dmx_direction_t)(DMX512_mode_t);
 
 /*******************************************************************************
  *
@@ -4694,7 +4692,7 @@ typedef void (*DMX512_hal_set_dmx_direction_t)(DMX512_mode_t mode);
  *
  ******************************************************************************/
 
-typedef void (*DMX512_hal_generate_tx_break_t)(bool enable);
+typedef void (*DMX512_hal_generate_tx_break_t)(bool);
 
 /*******************************************************************************
  *
@@ -4786,7 +4784,7 @@ typedef uint8_t (*DMX512_hal_read_rx_register_t)(void);
  *
  ******************************************************************************/
 
-typedef void (*DMX512_hal_write_tx_register_t)(uint8_t value);
+typedef void (*DMX512_hal_write_tx_register_t)(uint8_t);
 
 /*******************************************************************************
  *
@@ -4812,9 +4810,9 @@ typedef bool (*DMX512_hal_error_check_rx_overflow_t)(void);
  *
  * DESCRIPTION:
  *  Hardware abstraction layer function template for a user-provided function
- *  which will check if the break error interrupt flag was triggered. This is not 
- *  really an error in DMX context, but is expected, and needed, to operate 
- *  correctly. We expect each new received packet to be preceeded with  a break 
+ *  which will check if the break error interrupt flag was triggered. This is not
+ *  really an error in DMX context, but is expected, and needed, to operate
+ *  correctly. We expect each new received packet to be preceeded with  a break
  *  which will trigger a break interrupt.
  *
  * RETURN:
@@ -4880,7 +4878,7 @@ typedef void (*DMX512_hal_clear_rx_error_flags_t)(void);
  *
  ******************************************************************************/
 
-typedef void (*DMX512_hal_enable_rx_fault_interrupt_t)(bool enable);
+typedef void (*DMX512_hal_enable_rx_fault_interrupt_t)(bool);
 
 /*******************************************************************************
  *
@@ -4937,7 +4935,7 @@ typedef void (*DMX512_hal_clear_dma_transfer_complete_interrupt_t)(void);
  *
  ******************************************************************************/
 
-typedef bool (*DMX512_hal_configure_dma_receive_t)(void* dest_addr, uint32_t dest_length);
+typedef bool (*DMX512_hal_configure_dma_receive_t)(void*, uint32_t);
 
 /*******************************************************************************
  *
@@ -4962,7 +4960,7 @@ typedef bool (*DMX512_hal_configure_dma_receive_t)(void* dest_addr, uint32_t des
  *
  ******************************************************************************/
 
-typedef bool (*DMX512_hal_configure_dma_transmit_t)(void* src_addr, uint32_t src_length);
+typedef bool (*DMX512_hal_configure_dma_transmit_t)(void*, uint32_t);
 
 /*******************************************************************************
  *
@@ -5001,11 +4999,11 @@ typedef void (*DMX512_hal_disable_dma_t)(void);
  *
  * stable_dmx
  *  Points to the last completed and stable DMX data transaction data structure.
- * 
+ *
  * stable_other
- *  Points to the last completed and stable non-DMX data (RDM, TEXT, etc...) 
+ *  Points to the last completed and stable non-DMX data (RDM, TEXT, etc...)
  *  transaction data structure.
- * 
+ *
  * stable
  *  Points to the last completed data transaction data structure, either the
  *  stable_dmx or stable_other.
@@ -5016,17 +5014,17 @@ typedef void (*DMX512_hal_disable_dma_t)(void);
  *
  * break_us
  *  Time, in microseconds, that the line is held low for the "break" portion of
- *  the protocol. This value is defaulted at initialization, but can be modified 
+ *  the protocol. This value is defaulted at initialization, but can be modified
  *  by the user to suit their timing needs.
- * 
+ *
  * mark_after_break_us
  *  Time, in microseconds, that the line is held high for the "MAB" portion of
- *  the protocol. This value is defaulted at initialization, but can be modified 
+ *  the protocol. This value is defaulted at initialization, but can be modified
  *  by the user to suit their timing needs.
- * 
+ *
  * tx_post_timeout_us
  *  Time, in microseconds, that the alrogithm times out after completely sending
- *  the DMX data to the UART peripheral before starting the break condition. 
+ *  the DMX data to the UART peripheral before starting the break condition.
  *  This is intended to provide sufficient time for the peripheral to completely
  *  finish transmitting the Tx data. This value is defaulted at initialization,
  *  but can be modified by the user to suit their timing needs.
@@ -5356,7 +5354,7 @@ EEPROMI2C_flags_t;
  *
  ******************************************************************************/
 
-typedef void (*EEPROMI2C_pre_task_callback_t)(uint32_t context);
+typedef void (*EEPROMI2C_pre_task_callback_t)(uint32_t);
 
 /*******************************************************************************
  *
@@ -5375,7 +5373,7 @@ typedef void (*EEPROMI2C_pre_task_callback_t)(uint32_t context);
  *
  ******************************************************************************/
 
-typedef void (*EEPROMI2C_post_task_callback_t)(uint32_t context);
+typedef void (*EEPROMI2C_post_task_callback_t)(uint32_t);
 
 /*******************************************************************************
  *
@@ -5728,11 +5726,25 @@ extern const GFX2DFONT_font_t GFX2DFONT_DEFAULT_FONT;
 
 /*******************************************************************************
  *
- *  Graphics library for small screens. Objects are rendered into a memory
- *  buffer, a canvas which represents the screen. External user code is then
- *  required to actually send the memory buffer over to the LCD. This library
- *  uses RGB-565 coloring (5-bits RED, 6-bits GREEN, 5-bits BLUE) for 16-bit
- *  coloring values.
+ *  Simple graphics library which can render basic shapes and images. Elements
+ *  are rendered into a memory buffer. It is then up to external user code to
+ *  send the buffer to the display.
+ *
+ *  With segmentation the target display can be rendered in parts. This is used
+ *  when there is not enough memory to host an entire virtual display buffer.
+ *  Since each segment requires a re-render of the display frame, it is ideal
+ *  to have a large enough buffer which can hold the entire virtual display
+ *  frame buffer.
+ *
+ *  This library supports all combinations of up to 32-bit RGB formats (e.g.
+ *  3:3:2, 3:3:3, 4:4:4, 5:6:5, 6:6:6, 8:8:8, etc...) The RGB bit makeup of the
+ *  pixel is irrelevant to the library logic. Instead, the user is required to
+ *  provide a function which interprets a provided RBGA color into the desired
+ *  pixel format.
+ *
+ *  While this library supports non-byte-aligned formats (i.e. when the sum of
+ *  the RGBA bits is not divisible by 8), the algorithm throughput for these
+ *  formats is considerably slower, on the order to 20x slower or more.
  *
  ******************************************************************************/
 
@@ -5744,6 +5756,23 @@ extern const GFX2DFONT_font_t GFX2DFONT_DEFAULT_FONT;
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/*******************************************************************************
+ *
+ * GFX2D_rgb_bitmap_t
+ *
+ * DESCRIPTION:
+ *  Enumerates the various supported bitmap types for draw_rgb_bitmap.
+ *
+ ******************************************************************************/
+
+typedef enum
+{
+  GFX2D_RGB_BITMAP_332                    = 0,
+  GFX2D_RGB_BITMAP_565,
+  GFX2D_RGB_BITMAP_888
+}
+GFX2D_rgb_bitmap_t;
 
 /*******************************************************************************
  *
@@ -5767,6 +5796,30 @@ GFX2D_circle_quadrant_t;
 
 /*******************************************************************************
  *
+ * GFX2D_rgba_t
+ *
+ * DESCRIPTION:
+ *  Traditional 32-bit color, RGB with an Alpha channel. This type is used for
+ *  user input and does not necessarily reflect the rendered color based on
+ *  pixel color settings.
+ *
+ ******************************************************************************/
+
+typedef union
+{
+  uint32_t all;
+  struct
+  {
+    uint32_t r                            : 8;
+    uint32_t g                            : 8;
+    uint32_t b                            : 8;
+    uint32_t a                            : 8;
+  };
+}
+GFX2D_rgba_t;
+
+/*******************************************************************************
+ *
  * GFX2D_font_t
  *
  * DESCRIPTION:
@@ -5782,7 +5835,7 @@ GFX2D_circle_quadrant_t;
  *  The current y-start location of the next character to write.
  *
  * color
- *  Text color.
+ *  See GFX2D_rgba_t. (Uint32_t used for quicker access.)
  *
  * x_magnification
  *  Magnification of the text in the x-direction.
@@ -5797,7 +5850,7 @@ typedef struct
   GFX2DFONT_font_t* font;
   int16_t cursor_x;
   int16_t cursor_y;
-  uint16_t color;
+  uint32_t color;
   uint8_t x_magnification;
   uint8_t y_magnification;
 }
@@ -5810,11 +5863,12 @@ GFX2D_font_t;
  * DESCRIPTION:
  *  Module flags.
  *
- * swap_byte_order
- *  Many displays expect data to be in big endian format while many processors
- *  operate in little endian. By setting this flag true, the byte ordering will
- *  be swapped during the rendering operations before the color values are
- *  written to the buffer.
+ * byte_aligned
+ *  Indicates whether bits_per_pixel is evenly divisible by 8, that is, it has
+ *  byte alignment. This flag is set or cleared during initialization.
+ *
+ * invert
+ *  Inverts the pixel location output to support a 180-degree screen rotation.
  *
  * wrap_text
  *  Will cause text to wrap around to the next line automatically if the end
@@ -5827,12 +5881,176 @@ typedef union
   uint8_t all;
   struct
   {
-    uint8_t swap_byte_order               : 1;
+    uint8_t byte_aligned                  : 1;
+    uint8_t invert                        : 1;
     uint8_t wrap_text                     : 1;
-    uint8_t reserved2                     : 6;
+    uint8_t reserved3                     : 5;
   };
 }
 GFX2D_flags_t;
+
+/*******************************************************************************
+ *
+ * GFX2D_rgba_to_pixel_t
+ *
+ * DESCRIPTION:
+ *  Function template for a user-provided function which is called to convert
+ *  a GFX2D_rgba_t into the desired pixel format. If the number of bits per
+ *  pixel is less than 32, then the output pixels should only occupy the least
+ *  significant bits.
+ *
+ *  The user should also include any byte-swapping as required to support big
+ *  versus little endian formatting.
+ *
+ * PARAMETERS:
+ *  rgba
+ *   See GFX2D_rgba_t. (Uint32_t used for quicker access.)
+ *
+ * RETURN:
+ *  Formatted pixel color.
+ *
+ * NOTES:
+ *  Can be initialized as NULL - NO
+ *
+ ******************************************************************************/
+
+typedef uint32_t (*GFX2D_rgba_to_pixel_t)(uint32_t);
+
+/*******************************************************************************
+ *
+ * GFX2D_canvas_fill_handler_t
+ *
+ * DESCRIPTION:
+ *  Function template for internal helper functions for GFX2D_fill_canvas. The
+ *  canvas fill function is used to clear the screen and set a background color.
+ *  Hence, having a direct call to an optimized handler can significantly improve
+ *  performance.
+ *
+ * PARAMETERS:
+ *  instance
+ *   Pointer to GFX2D_instance_t.
+ *
+ *  color
+ *   Formatted pixel color.
+ *
+ * NOTES:
+ *  For internal use only.
+ *
+ ******************************************************************************/
+
+typedef void (*GFX2D_canvas_fill_handler_t)(void*, uint32_t);
+
+/*******************************************************************************
+ *
+ * GFX2D_draw_hline_handler_t
+ *
+ * DESCRIPTION:
+ *  Function template for internal helper functions for GFX2D_draw_hline. The
+ *  hline function is used for the various filled objects, such as triangle,
+ *  rectangle, and circle. Hence, having a direct call to an optimized handler
+ *  can significantly improve performance.
+ *
+ * PARAMETERS:
+ *  instance
+ *   Pointer to GFX2D_instance_t.
+ *
+ *  x
+ *   X-Coords starting point of line.
+ *
+ *  y
+ *   Y-Coords starting point of line.
+ *
+ *  length
+ *   Length of the line in pixels.
+ *
+ *  color
+ *   Formatted pixel color.
+ *
+ * NOTES:
+ *  For internal use only.
+ *
+ ******************************************************************************/
+
+typedef void (*GFX2D_draw_hline_handler_t)(void*,
+                                           int16_t,
+                                           int16_t,
+                                           int16_t,
+                                           uint32_t);
+
+/*******************************************************************************
+ *
+ * GFX2D_draw_vline_handler_t
+ *
+ * DESCRIPTION:
+ *  Function template for internal helper functions for GFX2D_draw_vline.
+ *
+ * PARAMETERS:
+ *  instance
+ *   Pointer to GFX2D_instance_t.
+ *
+ *  x
+ *   X-Coords starting point of line.
+ *
+ *  y
+ *   Y-Coords starting point of line.
+ *
+ *  length
+ *   Length of the line in pixels.
+ *
+ *  color
+ *   Formatted pixel color.
+ *
+ * NOTES:
+ *  For internal use only.
+ *
+ ******************************************************************************/
+
+typedef void (*GFX2D_draw_vline_handler_t)(void*,
+                                           int16_t,
+                                           int16_t,
+                                           int16_t,
+                                           uint32_t);
+
+/*******************************************************************************
+ *
+ * GFX2D_draw_filled_rectangle_handler_t
+ *
+ * DESCRIPTION:
+ *  Function template for internal helper functions for GFX2D_draw_filled_-
+ *  rectangle. The filled rectangle function is used for drawing panels and
+ *  other large areas. Hence, having a direct call to an optimized handler can
+ *  significantly improve performance.
+ *
+ * PARAMETERS:
+ *  instance
+ *   Pointer to GFX2D_instance_t.
+ *
+ *  x
+ *   X-Coords starting point of line.
+ *
+ *  y
+ *   Y-Coords starting point of line.
+ *
+ *  width
+ *   Width of the rectangle in pixels.
+ *
+ *  height
+ *   Height of the rectangle in pixels.
+ *
+ *  color
+ *   Formatted pixel color.
+ *
+ * NOTES:
+ *  For internal use only.
+ *
+ ******************************************************************************/
+
+typedef void (*GFX2D_draw_filled_rectangle_handler_t)(void*,
+                                                      int16_t,
+                                                      int16_t,
+                                                      int16_t,
+                                                      int16_t,
+                                                      uint32_t);
 
 /*******************************************************************************
  *
@@ -5841,39 +6059,108 @@ GFX2D_flags_t;
  * DESCRIPTION:
  *  Instance data and function pointers.
  *
+ * NOTE:
+ *  The drawing canvas is a segmented portion of the target display frame. If
+ *  resources allow, the canvas dimensions should be the same as the target for
+ *  maximum efficiency. Otherwise, the canvas represents a portion of the target
+ *  display frame defined by a x,y offset and width and height.
+ *
  * flags
  *  Module flags.
  *
- * canvas_buffer
- *  Pointer to user-provided buffer. Buffer length in bytes must be at least
- *  (canvas_width * canvas_height * sizeof(uint16_t)).
+ * bits_per_pixel
+ *  The number of bits which make up a single pixel, ranging from 1 to 32.
+ *
+ * bytes_per_pixel
+ *  The number of bytes which make up a single pixel. This value is only used
+ *  for byte-aligned formats.
+ *
+ * display_buffer
+ *  Pointer to user-provided buffer which will hold the rendered graphics.
+ *
+ * display_buffer_length_bytes
+ *  Total length, in bytes, of the display buffer.
+ *
+ * display_buffer_length_pixels
+ *  Total length, in pixels, of the display buffer.
+ *
+ * display_target_width
+ *  The width, in pixels, of the target display.
+ *
+ * display_target_height
+ *  The height, in pixels, of the target display.
+ *
+ * canvas_x0
+ *  The starting x-offset relative to the target display frame which is mapped
+ *  to the canvas x-origin.
+ *
+ * canvas_y0
+ *  The starting y-offset relative to the target display frame which is mapped
+ *  to the canvas y-origin.
  *
  * canvas_width
- *  Width of the canvas which corresponds to the target screen width.
+ *  Width, in pixels, of the drawing canvas.
  *
  * canvas_height
- *  Height of the canvas which corresponds to the target screen height.
+ *  Height, in pixels, of the drawing canvas.
  *
- * canvas_buffer_length_bytes
- *  Total length, in bytes, of the canvas buffer.
+ * canvas_bits_per_row
+ *  The number of bits which compose a single drawing canvas row.
  *
- * canvas_buffer_length_elements
- *  Total length, in RGB pixels, of the canvas buffer.
+ * canvas_bytes_per_row
+ *  The number of bytes which compose a single drawing canvas row. This value
+ *  is only used for byte-aligned formats.
+ *
+ * canvas_length_bytes
+ *  Total length, in bytes, of the drawing canvas.
+ *
+ * canvas_length_pixels
+ *  Total length, in pixels, of the drawing canvas.
  *
  * font
  *  Collection of text related variables.
+ *
+ * rgba_to_pixel
+ *  See GFX2D_rgba_to_pixel_t.
+ *
+ * canvas_fill_handler
+ *  See GFX2D_canvas_fill_handler_t.
+ *
+ * draw_hline_handler
+ *  See GFX2D_draw_hline_handler_t.
+ *
+ * draw_vline_handler
+ *  See GFX2D_draw_vline_handler_t.
+ *
+ * draw_filled_rectangle_handler
+ *  See GFX2D_draw_filled_rectangle_handler_t.
  *
  ******************************************************************************/
 
 typedef struct
 {
   GFX2D_flags_t flags;
-  uint16_t* canvas_buffer;
+  uint8_t bits_per_pixel;
+  uint8_t bytes_per_pixel;
+  uint8_t* display_buffer;
+  uint32_t display_buffer_length_bytes;
+  uint32_t display_buffer_length_pixels;
+  int16_t display_target_width;
+  int16_t display_target_height;
+  int16_t canvas_x0;
+  int16_t canvas_y0;
   int16_t canvas_width;
   int16_t canvas_height;
-  uint32_t canvas_buffer_length_bytes;
-  uint32_t canvas_buffer_length_elements;
+  uint32_t canvas_bits_per_row;
+  uint32_t canvas_bytes_per_row;
+  uint32_t canvas_length_bytes;
+  uint32_t canvas_length_pixels;
   GFX2D_font_t font;
+  GFX2D_rgba_to_pixel_t rgba_to_pixel;
+  GFX2D_canvas_fill_handler_t canvas_fill_handler;
+  GFX2D_draw_hline_handler_t draw_hline_handler;
+  GFX2D_draw_vline_handler_t draw_vline_handler;
+  GFX2D_draw_filled_rectangle_handler_t draw_filled_rectangle_handler;
 }
 GFX2D_instance_t;
 
@@ -5883,7 +6170,9 @@ GFX2D_instance_t;
  *
  * DESCRIPTION:
  *  Initializes a module instance, erasing all data structures and setting
- *  default values.
+ *  default values. The drawing canvas is defaulted to a single pixel. The user
+ *  should call GFX2D_set_canvas_dimensions after initialization to set the draw
+ *  dimensions.
  *
  * PARAMETERS:
  *  See GFX2D_instance_t.
@@ -5891,49 +6180,49 @@ GFX2D_instance_t;
  ******************************************************************************/
 
 void GFX2D_initialize(GFX2D_instance_t* instance,
-                      uint16_t* canvas_buffer,
-                      int16_t canvas_width,
-                      int16_t canvas_height,
-                      bool swap_byte_order);
+                      uint8_t* display_buffer,
+                      uint32_t display_buffer_length_bytes,
+                      int16_t display_target_width,
+                      int16_t display_target_height,
+                      uint8_t bits_per_pixel,
+                      GFX2D_rgba_to_pixel_t rgba_to_pixel);
 
 /*******************************************************************************
  *
- * GFX2D_draw_pixel_raw
+ * GFX2D_set_canvas_dimensions
  *
  * DESCRIPTION:
- *  Draws a single pixel at the provided x,y coordinates with the provided
- *  color. This will NOT swap the color bytes but will directly write the
- *  color as-is to the buffer if the location is within buffer range.
+ *  Sets the drawing canvas origin and pixel width and height. If the user
+ *  display buffer is large enough to accomodate an entire virtual display frame
+ *  for the target display, it is ideal to only call this function once with an
+ *  origin of 0,0 and a width and height equal to the target display.
  *
  * PARAMETERS:
- *  x
- *   X-Coords of pixel.
- *
- *  y
- *   Y-Coords of pixel.
- *
- *  color_raw
- *   RGB-565 color to color pixel in raw format, that is, the bytes will not
- *   be switched.
+ *  See GFX2D_instance_t.
  *
  * RETURN:
- *  True if the pixel was within range of th buffer and written to the buffer,
- *  else, false.
+ *  True if the canvas dimensions were set, else, false if the dimensions
+ *  require more space than available in the display buffer. In this case, the
+ *  width and height are set to 1.
+ *
+ * NOTE:
+ *  Dimensions which overflow the target display width and height will be
+ *  trimmed. The function will still return true.
  *
  ******************************************************************************/
 
-bool GFX2D_draw_pixel_raw(GFX2D_instance_t* instance,
-                          int16_t x,
-                          int16_t y,
-                          uint16_t color_raw);
+bool GFX2D_set_canvas_dimensions(GFX2D_instance_t* instance,
+                                 int16_t canvas_x0,
+                                 int16_t canvas_y0,
+                                 int16_t canvas_width,
+                                 int16_t canvas_height);
 
 /*******************************************************************************
  *
  * GFX2D_draw_pixel
  *
  * DESCRIPTION:
- *  Draws a single pixel at the provided x,y coordinates with the provided
- *  color.
+ *  Draws a single pixel.
  *
  * PARAMETERS:
  *  x
@@ -5943,18 +6232,17 @@ bool GFX2D_draw_pixel_raw(GFX2D_instance_t* instance,
  *   Y-Coords of pixel.
  *
  *  color
- *   RGB-565 color to color pixel.
+ *   See GFX2D_rgba_t. (Uint32_t used for quicker access.)
  *
  * RETURN:
- *  True if the pixel was within range of th buffer and written to the buffer,
- *  else, false.
+ *  True if the pixel was drawn, else, false.
  *
  ******************************************************************************/
 
 bool GFX2D_draw_pixel(GFX2D_instance_t* instance,
                       int16_t x,
                       int16_t y,
-                      uint16_t color);
+                      uint32_t color);
 
 /*******************************************************************************
  *
@@ -5965,40 +6253,11 @@ bool GFX2D_draw_pixel(GFX2D_instance_t* instance,
  *
  * PARAMETERS:
  *  color
- *   RGB-565 color to color the canvas/screen.
+ *   See GFX2D_rgba_t. (Uint32_t used for quicker access.)
  *
  ******************************************************************************/
 
-void GFX2D_fill_canvas(GFX2D_instance_t* instance, uint16_t color);
-
-/*******************************************************************************
- *
- * GFX2D_draw_hline
- *
- * DESCRIPTION:
- *  Draws a horizontal line. This will NOT swap the color bytes.
- *
- * PARAMETERS:
- *  x
- *   X-Coords starting point of line.
- *
- *  y
- *   Y-Coords starting point of line.
- *
- *  length
- *   Length of the line in pixels.
- *
- *  color_raw
- *   RGB-565 color to color pixel in raw format, that is, the bytes will not
- *   be switched.
- *
- ******************************************************************************/
-
-void GFX2D_draw_hline_raw(GFX2D_instance_t* instance,
-                          int16_t x,
-                          int16_t y,
-                          int16_t length,
-                          uint16_t color_raw);
+void GFX2D_fill_canvas(GFX2D_instance_t* instance, uint32_t color);
 
 /*******************************************************************************
  *
@@ -6018,7 +6277,7 @@ void GFX2D_draw_hline_raw(GFX2D_instance_t* instance,
  *   Length of the line in pixels.
  *
  *  color
- *   RGB-565 color to color pixel.
+ *   See GFX2D_rgba_t. (Uint32_t used for quicker access.)
  *
  ******************************************************************************/
 
@@ -6026,7 +6285,7 @@ void GFX2D_draw_hline(GFX2D_instance_t* instance,
                       int16_t x,
                       int16_t y,
                       int16_t length,
-                      uint16_t color);
+                      uint32_t color);
 
 /*******************************************************************************
  *
@@ -6046,7 +6305,7 @@ void GFX2D_draw_hline(GFX2D_instance_t* instance,
  *   Length of the line in pixels.
  *
  *  color
- *   RGB-565 color to color pixel.
+ *   See GFX2D_rgba_t. (Uint32_t used for quicker access.)
  *
  ******************************************************************************/
 
@@ -6054,7 +6313,7 @@ void GFX2D_draw_vline(GFX2D_instance_t* instance,
                       int16_t x,
                       int16_t y,
                       int16_t length,
-                      uint16_t color);
+                      uint32_t color);
 
 /*******************************************************************************
  *
@@ -6077,7 +6336,7 @@ void GFX2D_draw_vline(GFX2D_instance_t* instance,
  *   Y-Coords ending point of line.
  *
  *  color
- *   RGB-565 color to color line.
+ *   See GFX2D_rgba_t. (Uint32_t used for quicker access.)
  *
  ******************************************************************************/
 
@@ -6086,7 +6345,7 @@ void GFX2D_draw_line(GFX2D_instance_t* instance,
                      int16_t y0,
                      int16_t x1,
                      int16_t y1,
-                     uint16_t color);
+                     uint32_t color);
 
 /*******************************************************************************
  *
@@ -6097,7 +6356,7 @@ void GFX2D_draw_line(GFX2D_instance_t* instance,
  *
  * PARAMETERS:
  *  x0
- *   X-Coords of first triangle point..
+ *   X-Coords of first triangle point.
  *
  *  y0
  *   Y-Coords of first triangle point..
@@ -6115,7 +6374,7 @@ void GFX2D_draw_line(GFX2D_instance_t* instance,
  *   Y-Coords of third triangle point.
  *
  *  color
- *   RGB-565 color to color triangle.
+ *   See GFX2D_rgba_t. (Uint32_t used for quicker access.)
  *
  ******************************************************************************/
 
@@ -6126,7 +6385,7 @@ void GFX2D_draw_triangle(GFX2D_instance_t* instance,
                          int16_t y1,
                          int16_t x2,
                          int16_t y2,
-                         uint16_t color);
+                         uint32_t color);
 
 /*******************************************************************************
  *
@@ -6137,10 +6396,10 @@ void GFX2D_draw_triangle(GFX2D_instance_t* instance,
  *
  * PARAMETERS:
  *  x0
- *   X-Coords of first triangle point..
+ *   X-Coords of first triangle point.
  *
  *  y0
- *   Y-Coords of first triangle point..
+ *   Y-Coords of first triangle point.
  *
  *  x1
  *   X-Coords of second triangle point.
@@ -6155,7 +6414,7 @@ void GFX2D_draw_triangle(GFX2D_instance_t* instance,
  *   Y-Coords of third triangle point.
  *
  *  color
- *   RGB-565 color to color triangle.
+ *   See GFX2D_rgba_t. (Uint32_t used for quicker access.)
  *
  ******************************************************************************/
 
@@ -6166,7 +6425,7 @@ void GFX2D_draw_filled_triangle(GFX2D_instance_t* instance,
                                 int16_t y1,
                                 int16_t x2,
                                 int16_t y2,
-                                uint16_t color);
+                                uint32_t color);
 
 /*******************************************************************************
  *
@@ -6190,7 +6449,7 @@ void GFX2D_draw_filled_triangle(GFX2D_instance_t* instance,
  *   Bit flag(s) indicating which arc(s), or quadrant(s) of a circle, to draw.
  *
  *  color
- *   RGB-565 color to arc.
+ *   See GFX2D_rgba_t. (Uint32_t used for quicker access.)
  *
  ******************************************************************************/
 
@@ -6199,7 +6458,7 @@ void GFX2D_draw_circle_arc(GFX2D_instance_t* instance,
                            int16_t y0,
                            int16_t radius,
                            GFX2D_circle_quadrant_t quadrant,
-                           uint16_t color);
+                           uint32_t color);
 
 /*******************************************************************************
  *
@@ -6223,7 +6482,7 @@ void GFX2D_draw_circle_arc(GFX2D_instance_t* instance,
  *   Bit flag(s) indicating which arc(s), or quadrant(s) of a circle, to draw.
  *
  *  color
- *   RGB-565 color to arc.
+ *   See GFX2D_rgba_t. (Uint32_t used for quicker access.)
  *
  ******************************************************************************/
 
@@ -6232,7 +6491,7 @@ void GFX2D_draw_filled_circle_arc(GFX2D_instance_t* instance,
                                   int16_t y0,
                                   int16_t radius,
                                   GFX2D_circle_quadrant_t quadrant,
-                                  uint16_t color);
+                                  uint32_t color);
 
 /*******************************************************************************
  *
@@ -6252,7 +6511,7 @@ void GFX2D_draw_filled_circle_arc(GFX2D_instance_t* instance,
  *   Radius of the circle.
  *
  *  color
- *   RGB-565 color to color the circle.
+ *   See GFX2D_rgba_t. (Uint32_t used for quicker access.)
  *
  ******************************************************************************/
 
@@ -6260,7 +6519,7 @@ void GFX2D_draw_circle(GFX2D_instance_t* instance,
                        int16_t x0,
                        int16_t y0,
                        int16_t radius,
-                       uint16_t color);
+                       uint32_t color);
 
 /*******************************************************************************
  *
@@ -6280,7 +6539,7 @@ void GFX2D_draw_circle(GFX2D_instance_t* instance,
  *   Radius of the circle.
  *
  *  color
- *   RGB-565 color to fill the circle.
+ *   See GFX2D_rgba_t. (Uint32_t used for quicker access.)
  *
  ******************************************************************************/
 
@@ -6288,7 +6547,7 @@ void GFX2D_draw_filled_circle(GFX2D_instance_t* instance,
                               int16_t x0,
                               int16_t y0,
                               int16_t radius,
-                              uint16_t color);
+                              uint32_t color);
 
 /*******************************************************************************
  *
@@ -6311,7 +6570,7 @@ void GFX2D_draw_filled_circle(GFX2D_instance_t* instance,
  *   Height of the rectangle in pixels.
  *
  *  color
- *   RGB-565 color to color pixel.
+ *   See GFX2D_rgba_t. (Uint32_t used for quicker access.)
  *
  ******************************************************************************/
 
@@ -6320,7 +6579,7 @@ void GFX2D_draw_rectangle(GFX2D_instance_t* instance,
                           int16_t y,
                           int16_t width,
                           int16_t height,
-                          uint16_t color);
+                          uint32_t color);
 
 /*******************************************************************************
  *
@@ -6343,7 +6602,7 @@ void GFX2D_draw_rectangle(GFX2D_instance_t* instance,
  *   Height of the rectangle in pixels.
  *
  *  color
- *   RGB-565 color to color pixel.
+ *   See GFX2D_rgba_t. (Uint32_t used for quicker access.)
  *
  ******************************************************************************/
 
@@ -6352,7 +6611,7 @@ void GFX2D_draw_filled_rectangle(GFX2D_instance_t* instance,
                                 int16_t y,
                                 int16_t width,
                                 int16_t height,
-                                uint16_t color);
+                                uint32_t color);
 
 /*******************************************************************************
  *
@@ -6375,7 +6634,7 @@ void GFX2D_draw_filled_rectangle(GFX2D_instance_t* instance,
  *   Height of the rectangle in pixels.
  *
  *  color
- *   RGB-565 color to color the rounded rectangle.
+ *   See GFX2D_rgba_t. (Uint32_t used for quicker access.)
  *
  ******************************************************************************/
 
@@ -6385,7 +6644,7 @@ void GFX2D_draw_rounded_rectangle(GFX2D_instance_t* instance,
                                   int16_t width,
                                   int16_t height,
                                   int16_t radius,
-                                  uint16_t color);
+                                  uint32_t color);
 
 /*******************************************************************************
  *
@@ -6408,7 +6667,7 @@ void GFX2D_draw_rounded_rectangle(GFX2D_instance_t* instance,
  *   Height of the rectangle in pixels.
  *
  *  color
- *   RGB-565 color to color the filled rounded rectangle.
+ *   See GFX2D_rgba_t. (Uint32_t used for quicker access.)
  *
  ******************************************************************************/
 
@@ -6418,114 +6677,38 @@ void GFX2D_draw_filled_rounded_rectangle(GFX2D_instance_t* instance,
                                          int16_t width,
                                          int16_t height,
                                          int16_t radius,
-                                         uint16_t color);
+                                         uint32_t color);
 
 /*******************************************************************************
  *
- * GFX2D_draw_rgb_bitmap
+ * GFX2D_draw_binary_bitmap
  *
  * DESCRIPTION:
- *  Draws a RGB-565 bitmap at the specified x,y location.
+ *  Draws a binary color bitmap at the specified x,y location. If the color and
+ *  background color are the same value, then the background color will not be
+ *  drawn and will instead act as a transparent pixel.
  *
  * PARAMETERS:
- *  x
- *   X-Coords starting point to draw bitmap.
- *
- *  y
- *   Y-Coords starting point to draw bitmap.
- *
- *  bitmap_width
- *   Full width of the bitmap image. Must be a positive value.
- *
- *  bitmap_height
- *   Full height of the bitmap image. Must be a positive value.
- *
  *  bitmap
- *   Pointer to the RGB-565 bitmap.
+ *   Pointer to the binary bitmap.
  *
- *  swap_byte_order
- *   Set true to swap the byte order of the 16-bit bitmap color values before
- *   inserting it into the canvas buffer.
+ *  x0, y0
+ *   Target display write origin.
  *
- ******************************************************************************/
-
-void GFX2D_draw_rgb_bitmap(GFX2D_instance_t* instance,
-                           int16_t x,
-                           int16_t y,
-                           int16_t bitmap_width,
-                           int16_t bitmap_height,
-                           uint16_t* bitmap,
-                           bool swap_byte_order);
-
-/*******************************************************************************
+ *  bitmap_x0, bitmap_y0
+ *   Bitmap read origin.
  *
- * GFX2D_draw_rgb_bitmap_with_alpha_mask
+ *  bitmap_width_draw
+ *   The width, in pixels, of the bitmap portion to draw.
  *
- * DESCRIPTION:
- *  Draws a RGB-565 bitmap at the specified x,y location.
+ *  bitmap_height_draw
+ *   The height, in pixels, of the bitmap portion to draw.
  *
- * PARAMETERS:
- *  x
- *   X-Coords starting point to draw bitmap.
+ *  bitmap_width_total
+ *   The width, in pixels, of the complete bitmap image.
  *
- *  y
- *   Y-Coords starting point to draw bitmap.
- *
- *  bitmap_width
- *   Full width of the bitmap image. Must be a positive value.
- *
- *  bitmap_height
- *   Full height of the bitmap image. Must be a positive value.
- *
- *  bitmap
- *   Pointer to the RGB-565 bitmap.
- *
- *  alpha_mask
- *   Bit-mask indicating which pixels should be transparent (0) and which
- *   should be opaque (1). Each bit represents a pixel, so the length of the
- *   bitmap array should be the number of uint16_t bitmap divided by 8.
- *
- *  swap_byte_order
- *   Set true to swap the byte order of the 16-bit bitmap color values before
- *   inserting it into the canvas buffer.
- *
- ******************************************************************************/
-
-void GFX2D_draw_rgb_bitmap_with_alpha_mask(GFX2D_instance_t* instance,
-                                          int16_t x,
-                                          int16_t y,
-                                          int16_t bitmap_width,
-                                          int16_t bitmap_height,
-                                          uint16_t* bitmap,
-                                          uint8_t* alpha_mask,
-                                          bool swap_byte_order);
-
-/*******************************************************************************
- *
- * GFX2D_draw_mono_bitmap
- *
- * DESCRIPTION:
- *  Draws a mono bitmap at the specified x,y location. In a mono bitmap, each
- *  bit represents if the pixel it represents should be drawn or not. The
- *  user provides the color to be drawn, and can also provide a background
- *  color to draw for the 0-bits. If the background color is the same as the
- *  passed in foreground color then the 0-bits will be left transparent.
- *
- * PARAMETERS:
- *  x
- *   X-Coords starting point to draw bitmap.
- *
- *  y
- *   Y-Coords starting point to draw bitmap.
- *
- *  bitmap_width
- *   Full width of the bitmap image. Must be a positive value.
- *
- *  bitmap_height
- *   Full height of the bitmap image. Must be a positive value.
- *
- *  bitmap
- *   Pointer to the mono bitmap.
+ *  bitmap_height_total
+ *   The height, in pixels, of the complete bitmap image.
  *
  *  color
  *   Color set to a pixel when the corresponding bitmap bit is a 1.
@@ -6537,14 +6720,52 @@ void GFX2D_draw_rgb_bitmap_with_alpha_mask(GFX2D_instance_t* instance,
  *
  ******************************************************************************/
 
-void GFX2D_draw_mono_bitmap(GFX2D_instance_t* instance,
-                            int16_t x,
-                            int16_t y,
-                            int16_t bitmap_width,
-                            int16_t bitmap_height,
-                            uint8_t* bitmap,
-                            uint16_t color,
-                            uint16_t background_color);
+void GFX2D_draw_binary_bitmap(GFX2D_instance_t* instance,
+                              const uint8_t* bitmap,
+                              int16_t x0,
+                              int16_t y0,
+                              uint16_t bitmap_x0,
+                              uint16_t bitmap_y0,
+                              uint16_t bitmap_width_draw,
+                              uint16_t bitmap_height_draw,
+                              uint16_t bitmap_width_total,
+                              uint16_t bitmap_height_total,
+                              uint32_t color,
+                              uint32_t background_color);
+
+/*******************************************************************************
+ *
+ * GFX2D_draw_rgb_bitmap
+ *
+ * DESCRIPTION:
+ *  Draws an RGB bitmap at the specified x,y location.
+ *
+ * PARAMETERS:
+ *  rgb_bitmap
+ *   Bitmap format (332, 565, 888).
+ *
+ *  alpha_mask
+ *   Bit-mask indicating which pixels should be transparent (0) and which
+ *   should be opaque (1). Each bit represents a pixel, so the length of the
+ *   bitmap array in bytes should be the cieling of the number of bitmap pixels
+ *   divided by 8. This parameter can be left NULL if not needed.
+ *
+ *  See GFX2D_draw_binary_bitmap.
+ *
+ ******************************************************************************/
+
+void GFX2D_draw_rgb_bitmap(GFX2D_instance_t* instance,
+                           GFX2D_rgb_bitmap_t rgb_bitmap,
+                           const uint8_t* bitmap,
+                           const uint8_t* alpha_mask,
+                           int16_t x0,
+                           int16_t y0,
+                           uint16_t bitmap_x0,
+                           uint16_t bitmap_y0,
+                           uint16_t bitmap_width_draw,
+                           uint16_t bitmap_height_draw,
+                           uint16_t bitmap_width_total,
+                           uint16_t bitmap_height_total);
 
 /*******************************************************************************
  *
@@ -6590,12 +6811,27 @@ void GFX2D_set_font(GFX2D_instance_t* instance, GFX2DFONT_font_t* font);
  *  Sets the font color.
  *
  * PARAMETERS:
- *  conlor
- *   Color of the font.
+ *  color
+ *   See GFX2D_rgba_t. (Uint32_t used for quicker access.)
  *
  ******************************************************************************/
 
-void GFX2D_set_font_color(GFX2D_instance_t* instance, uint16_t color);
+void GFX2D_set_font_color(GFX2D_instance_t* instance, uint32_t color);
+
+/*******************************************************************************
+ *
+ * GFX2D_set_inverted
+ *
+ * DESCRIPTION:
+ *  Enables or disables inverted rendering.
+ *
+ * PARAMETERS:
+ *  enable_inverted
+ *   True to enable inverted rendering, else, false to disable.
+ *
+ ******************************************************************************/
+
+void GFX2D_set_inverted(GFX2D_instance_t* instance, bool enable_inverted);
 
 /*******************************************************************************
  *
@@ -6607,7 +6843,7 @@ void GFX2D_set_font_color(GFX2D_instance_t* instance, uint16_t color);
  *
  * PARAMETERS:
  *  enable_wrap
- *   True to enable wrapping, false to disable wrapping.
+ *   True to enable wrapping, else, false to disable.
  *
  ******************************************************************************/
 
@@ -6636,7 +6872,7 @@ void GFX2D_draw_char(GFX2D_instance_t* instance, uint8_t c);
 
 /*******************************************************************************
  *
- *  ILI9xxx display module which utilizes the Gfx2d library and sends pixel
+ *  Ili9341 display module which utilizes the Gfx2d library and sends pixel
  *  data through SPI DMA. Requires proper initialization and the service
  *  routine to be called repeatedly after a new task request until the task
  *  is completed.
@@ -6654,7 +6890,7 @@ extern "C" {
 
 /*******************************************************************************
  *
- * ILI9XXX_custom_command_t
+ * ILI9341_custom_command_t
  *
  * DESCRIPTION:
  *  Custom command values which are used during the device initialization to
@@ -6665,14 +6901,14 @@ extern "C" {
 
 typedef enum
 {
-  ILI9XXX_CUSTOM_COMMAND_END_OF_LIST      = 0x00,
-  ILI9XXX_CUSTOM_COMMAND_DELAY_MS         = 0xFF
+  ILI9341_CUSTOM_COMMAND_END_OF_LIST      = 0x00,
+  ILI9341_CUSTOM_COMMAND_DELAY_MS         = 0xFF
 }
-ILI9XXX_custom_command_t;
+ILI9341_custom_command_t;
 
 /*******************************************************************************
  *
- * ILI9XXX_flags_t
+ * ILI9341_flags_t
  *
  * DESCRIPTION:
  *  Module flags.
@@ -6689,6 +6925,11 @@ ILI9XXX_custom_command_t;
  *  Set when the current task is a register write and cleared when the task is
  *  a register read.
  *
+ * single_segment
+ *  Set during initialization if the dispaly buffer is large enough to hold
+ *  the entire target display frame. This allows us to do some one-time
+ *  calculations during initialization and save time during the display update.
+ *
  * task_state
  *  State machine state.
  *
@@ -6702,16 +6943,16 @@ typedef union
     uint8_t busy                          : 1;
     uint8_t dma_busy                      : 1;
     uint8_t reg_write                     : 1;
-    uint8_t reserved3                     : 1;
+    uint8_t single_segment                : 1;
     uint8_t task_state                    : 3;
     uint8_t reserved7                     : 1;
   };
 }
-ILI9XXX_flags_t;
+ILI9341_flags_t;
 
 /*******************************************************************************
  *
- * ILI9XXX_error_flags_t
+ * ILI9341_error_flags_t
  *
  * DESCRIPTION:
  *  Module error flags.
@@ -6735,11 +6976,26 @@ typedef union
     uint8_t reserved2                     : 6;
   };
 }
-ILI9XXX_error_flags_t;
+ILI9341_error_flags_t;
 
 /*******************************************************************************
  *
- * ILI9XXX_pre_task_callback_t
+ * ILI9341_draw_handler_t
+ *
+ * DESCRIPTION:
+ *  Function template for a user-provided function which is called to render
+ *  the display buffer utilizing the GFX2D module.
+ *
+ * NOTES:
+ *  Can be initialized as NULL - NO
+ *
+ ******************************************************************************/
+
+typedef void (*ILI9341_draw_handler_t)(void);
+
+/*******************************************************************************
+ *
+ * ILI9341_pre_task_callback_t
  *
  * DESCRIPTION:
  *  Function template for a user-provided function which is called when a new
@@ -6756,11 +7012,11 @@ ILI9XXX_error_flags_t;
  *
  ******************************************************************************/
 
-typedef void (*ILI9XXX_pre_task_callback_t)(uint32_t context);
+typedef void (*ILI9341_pre_task_callback_t)(uint32_t);
 
 /*******************************************************************************
  *
- * ILI9XXX_post_task_callback_t
+ * ILI9341_post_task_callback_t
  *
  * DESCRIPTION:
  *  Function template for a user-provided function which is called after a
@@ -6775,11 +7031,11 @@ typedef void (*ILI9XXX_pre_task_callback_t)(uint32_t context);
  *
  ******************************************************************************/
 
-typedef void (*ILI9XXX_post_task_callback_t)(uint32_t context);
+typedef void (*ILI9341_post_task_callback_t)(uint32_t);
 
 /*******************************************************************************
  *
- * ILI9XXX_hal_set_cable_select_t
+ * ILI9341_hal_set_cable_select_t
  *
  * DESCRIPTION:
  *  Hardware abstraction layer function template for a user-provided function
@@ -6794,11 +7050,11 @@ typedef void (*ILI9XXX_post_task_callback_t)(uint32_t context);
  *
  ******************************************************************************/
 
-typedef void (*ILI9XXX_hal_set_cable_select_t)(bool enable);
+typedef void (*ILI9341_hal_set_cable_select_t)(bool);
 
 /*******************************************************************************
  *
- * ILI9XXX_hal_set_dc_select_t
+ * ILI9341_hal_set_dc_select_t
  *
  * DESCRIPTION:
  *  Hardware abstraction layer function template for a user-provided function
@@ -6813,11 +7069,11 @@ typedef void (*ILI9XXX_hal_set_cable_select_t)(bool enable);
  *
  ******************************************************************************/
 
-typedef void (*ILI9XXX_hal_set_dc_select_t)(bool enable);
+typedef void (*ILI9341_hal_set_dc_select_t)(bool);
 
 /*******************************************************************************
  *
- * ILI9XXX_hal_configure_dma_t
+ * ILI9341_hal_configure_dma_t
  *
  * DESCRIPTION:
  *  Hardware abstraction layer function template for a user-provided function
@@ -6838,11 +7094,11 @@ typedef void (*ILI9XXX_hal_set_dc_select_t)(bool enable);
  *
  ******************************************************************************/
 
-typedef bool (*ILI9XXX_hal_configure_dma_t)(void* src_addr, uint32_t src_length);
+typedef bool (*ILI9341_hal_configure_dma_t)(void*, uint32_t);
 
 /*******************************************************************************
  *
- * ILI9XXX_hal_disable_dma_t
+ * ILI9341_hal_disable_dma_t
  *
  * DESCRIPTION:
  *  Hardware abstraction layer function template for a user-provided function
@@ -6853,11 +7109,11 @@ typedef bool (*ILI9XXX_hal_configure_dma_t)(void* src_addr, uint32_t src_length)
  *
  ******************************************************************************/
 
-typedef void (*ILI9XXX_hal_disable_dma_t)(void);
+typedef void (*ILI9341_hal_disable_dma_t)(void);
 
 /*******************************************************************************
  *
- * ILI9XXX_instance_t
+ * ILI9341_instance_t
  *
  * DESCRIPTION:
  *  Instance data and function pointers.
@@ -6886,6 +7142,20 @@ typedef void (*ILI9XXX_hal_disable_dma_t)(void);
  * bus_id
  *  The BUS ID associated with the BUSMUTEX instance.
  *
+ * render_y0
+ *  Keeps track of the last rendered y-offset.
+ *
+ * render_rows
+ *  The number of rows starting from render_y0 which are buffered and sent to
+ *  the display in a single rendering iteration.
+ *
+ * render_page_buffer
+ *  Holds the register and parameters for setting the starting page/row.
+ *
+ * display_adjust_y
+ *  Adjusts the column and row starting and ending positions. (This is used for
+ *  cheap screens which may not be properly aligned within their frames).
+ *
  * reg_address
  *  Register address to read/write in register rw task.
  *
@@ -6913,7 +7183,7 @@ typedef void (*ILI9XXX_hal_disable_dma_t)(void);
  *  the DMA. This is calculated early on to avoid repetitive math during the
  *  transaction process.
  *
- * dma_source_buffer_offset
+ * dma_src_buffer_offset
  *  Offset into the source buffer which is being transmitted by DMA.
  *
  * callback_context
@@ -6923,6 +7193,9 @@ typedef void (*ILI9XXX_hal_disable_dma_t)(void);
  *  Function pointer to the service routine applicable to the initialized
  *  service mode.
  *
+ * draw_handler
+ *  See ILI9341_draw_handler_t
+ *
  * *_task_*
  * *_hal_*
  *  User-provided functions. See typedef comments.
@@ -6931,14 +7204,18 @@ typedef void (*ILI9XXX_hal_disable_dma_t)(void);
 
 typedef struct
 {
-  volatile ILI9XXX_flags_t flags;
-  ILI9XXX_error_flags_t errors;
+  volatile ILI9341_flags_t flags;
+  ILI9341_error_flags_t errors;
   GFX2D_instance_t* gfx2d;
   UTIMER_instance_t* utimer;
   SERSPI_instance_t* spi;
   UTIMER_ticket_t utimer_ticket;
   BUSMUTEX_instance_t* bus_mutex;
   BUSMUTEX_bus_id_t bus_id;
+  uint16_t render_y0;
+  uint16_t render_rows;
+  uint8_t render_page_buffer[4];
+  int8_t display_adjust_y;
   uint8_t reg_address;
   void* reg_buffer;
   uint32_t reg_length;
@@ -6947,21 +7224,22 @@ typedef struct
   uint32_t dma_transfer_counter;
   uint32_t dma_transfer_count;
   uint32_t dma_transfer_last_packet_length;
-  uint32_t dma_source_buffer_offset;
+  uint32_t dma_src_buffer_offset;
   uint32_t callback_context;
   bool (*service_handler)(void* instance);
-  ILI9XXX_pre_task_callback_t pre_task_callback;
-  ILI9XXX_post_task_callback_t post_task_callback;
-  ILI9XXX_hal_set_cable_select_t set_cable_select;
-  ILI9XXX_hal_set_dc_select_t set_dc_select;
-  ILI9XXX_hal_configure_dma_t configure_dma;
-  ILI9XXX_hal_disable_dma_t disable_dma;
+  ILI9341_draw_handler_t draw_handler;
+  ILI9341_pre_task_callback_t pre_task_callback;
+  ILI9341_post_task_callback_t post_task_callback;
+  ILI9341_hal_set_cable_select_t set_cable_select;
+  ILI9341_hal_set_dc_select_t set_dc_select;
+  ILI9341_hal_configure_dma_t configure_dma;
+  ILI9341_hal_disable_dma_t disable_dma;
 }
-ILI9XXX_instance_t;
+ILI9341_instance_t;
 
 /*******************************************************************************
  *
- * ILI9XXX_dma_transfer_complete_handler
+ * ILI9341_dma_transfer_complete_handler
  *
  * DESCRIPTION:
  *  Handler for the DMA transfer complete interrupt. The user code must call
@@ -6973,22 +7251,22 @@ ILI9XXX_instance_t;
  *
  ******************************************************************************/
 
-void ILI9XXX_dma_transfer_complete_handler(ILI9XXX_instance_t* instance);
+void ILI9341_dma_transfer_complete_handler(ILI9341_instance_t* instance);
 
 /*******************************************************************************
  *
- * ILI9XXX_initialize
+ * ILI9341_initialize
  *
  * DESCRIPTION:
  *  Initializes a module instance, erasing all data structures and setting
  *  default values.
  *
  * PARAMETERS:
- *  See ILI9XXX_instance_t.
+ *  See ILI9341_instance_t.
  *
  ******************************************************************************/
 
-void ILI9XXX_initialize(ILI9XXX_instance_t* instance,
+void ILI9341_initialize(ILI9341_instance_t* instance,
                         GFX2D_instance_t* gfx2d,
                         UTIMER_instance_t* utimer,
                         SERSPI_instance_t* spi,
@@ -6996,16 +7274,17 @@ void ILI9XXX_initialize(ILI9XXX_instance_t* instance,
                         BUSMUTEX_bus_id_t bus_id,
                         uint32_t dma_bytes_per_transfer,
                         uint32_t dma_transfer_timeout_us,
-                        ILI9XXX_pre_task_callback_t pre_task_callback,
-                        ILI9XXX_post_task_callback_t post_task_callback,
-                        ILI9XXX_hal_set_cable_select_t set_cable_select,
-                        ILI9XXX_hal_set_dc_select_t set_dc_select,
-                        ILI9XXX_hal_configure_dma_t configure_dma,
-                        ILI9XXX_hal_disable_dma_t disable_dma);
+                        ILI9341_draw_handler_t draw_handler,
+                        ILI9341_pre_task_callback_t pre_task_callback,
+                        ILI9341_post_task_callback_t post_task_callback,
+                        ILI9341_hal_set_cable_select_t set_cable_select,
+                        ILI9341_hal_set_dc_select_t set_dc_select,
+                        ILI9341_hal_configure_dma_t configure_dma,
+                        ILI9341_hal_disable_dma_t disable_dma);
 
 /*******************************************************************************
  *
- * ILI9XXX_configure_display
+ * ILI9341_configure_display
  *
  * DESCRIPTION:
  *  Sends a series of commands to the display to initialize it and turn it on.
@@ -7015,7 +7294,7 @@ void ILI9XXX_initialize(ILI9XXX_instance_t* instance,
  *    <command>, <arg_count>, <...arguments...>,
  *
  *  If the argument count is 0 then the arguments field is omitted. Additional
- *  custom commands can be found in ILI9XXX_custom_command_t. The delay command
+ *  custom commands can be found in ILI9341_custom_command_t. The delay command
  *  takes a single argument, which represents the number of milliseconds to
  *  delay, which takes the place of the arg_count field. Eg.
  *
@@ -7043,11 +7322,11 @@ void ILI9XXX_initialize(ILI9XXX_instance_t* instance,
  *
  ******************************************************************************/
 
-void ILI9XXX_configure_display(ILI9XXX_instance_t* instance, const uint8_t* command_list);
+void ILI9341_configure_display(ILI9341_instance_t* instance, const uint8_t* command_list);
 
 /*******************************************************************************
  *
- * ILI9XXX_begin_new_register_write
+ * ILI9341_begin_new_register_write
  *
  * DESCRIPTION:
  *  Attempts to begin a new register write task.
@@ -7067,14 +7346,14 @@ void ILI9XXX_configure_display(ILI9XXX_instance_t* instance, const uint8_t* comm
  *
  ******************************************************************************/
 
-bool ILI9XXX_begin_new_register_write(ILI9XXX_instance_t* instance,
+bool ILI9341_begin_new_register_write(ILI9341_instance_t* instance,
                                       uint8_t reg_address,
                                       void* buffer,
                                       uint32_t length);
 
 /*******************************************************************************
  *
- * ILI9XXX_begin_new_register_read
+ * ILI9341_begin_new_register_read
  *
  * DESCRIPTION:
  *  Attempts to begin a new register read task.
@@ -7094,14 +7373,14 @@ bool ILI9XXX_begin_new_register_write(ILI9XXX_instance_t* instance,
  *
  ******************************************************************************/
 
-bool ILI9XXX_begin_new_register_read(ILI9XXX_instance_t* instance,
+bool ILI9341_begin_new_register_read(ILI9341_instance_t* instance,
                                      uint8_t reg_address,
                                      void* buffer,
                                      uint32_t length);
 
 /*******************************************************************************
  *
- * ILI9XXX_begin_new_display_update
+ * ILI9341_begin_new_display_update
  *
  * DESCRIPTION:
  *  Attempts to begin a new display update task.
@@ -7111,11 +7390,11 @@ bool ILI9XXX_begin_new_register_read(ILI9XXX_instance_t* instance,
  *
  ******************************************************************************/
 
-bool ILI9XXX_begin_new_display_update(ILI9XXX_instance_t* instance);
+bool ILI9341_begin_new_display_update(ILI9341_instance_t* instance);
 
 /*******************************************************************************
  *
- * ILI9XXX_service
+ * ILI9341_service
  *
  * DESCRIPTION:
  *  Services the task state machine. Must be called repeatedly until the task
@@ -7126,11 +7405,11 @@ bool ILI9XXX_begin_new_display_update(ILI9XXX_instance_t* instance);
  *
  ******************************************************************************/
 
-bool ILI9XXX_service(ILI9XXX_instance_t* instance);
+bool ILI9341_service(ILI9341_instance_t* instance);
 
 /*******************************************************************************
  *
- * ILI9XXX_is_busy
+ * ILI9341_is_busy
  *
  * DESCRIPTION:
  *  Determines if an instance is currently busy with a task.
@@ -7140,7 +7419,7 @@ bool ILI9XXX_service(ILI9XXX_instance_t* instance);
  *
  ******************************************************************************/
 
-bool ILI9XXX_is_busy(ILI9XXX_instance_t* instance);
+bool ILI9341_is_busy(ILI9341_instance_t* instance);
 
 #ifdef __cplusplus
 }
@@ -8757,7 +9036,7 @@ NVMBASIC_flags_t;
  *
  ******************************************************************************/
 
-typedef void (*NVMBASIC_pre_task_callback_t)(uint32_t context);
+typedef void (*NVMBASIC_pre_task_callback_t)(uint32_t);
 
 /*******************************************************************************
  *
@@ -8776,7 +9055,7 @@ typedef void (*NVMBASIC_pre_task_callback_t)(uint32_t context);
  *
  ******************************************************************************/
 
-typedef void (*NVMBASIC_post_task_callback_t)(uint32_t context);
+typedef void (*NVMBASIC_post_task_callback_t)(uint32_t);
 
 /*******************************************************************************
  *
@@ -9437,7 +9716,7 @@ typedef bool (*ROTARYENCODER_hal_is_phase_b_set_t)(void);
  *
  ******************************************************************************/
 
-typedef void (*ROTARYENCODER_rotation_tick_callback_t)(bool clockwise);
+typedef void (*ROTARYENCODER_rotation_tick_callback_t)(bool);
 
 /*******************************************************************************
  *
@@ -9643,7 +9922,7 @@ SHIFTPISO_error_flags_t;
  *
  ******************************************************************************/
 
-typedef void (*SHIFTPISO_pre_task_callback_t)(uint32_t context);
+typedef void (*SHIFTPISO_pre_task_callback_t)(uint32_t);
 
 /*******************************************************************************
  *
@@ -9662,7 +9941,7 @@ typedef void (*SHIFTPISO_pre_task_callback_t)(uint32_t context);
  *
  ******************************************************************************/
 
-typedef void (*SHIFTPISO_post_task_callback_t)(uint32_t context);
+typedef void (*SHIFTPISO_post_task_callback_t)(uint32_t);
 
 /*******************************************************************************
  *
@@ -9681,7 +9960,7 @@ typedef void (*SHIFTPISO_post_task_callback_t)(uint32_t context);
  *
  ******************************************************************************/
 
-typedef void (*SHIFTPISO_hal_set_clock_t)(bool value);
+typedef void (*SHIFTPISO_hal_set_clock_t)(bool);
 
 /*******************************************************************************
  *
@@ -9700,7 +9979,7 @@ typedef void (*SHIFTPISO_hal_set_clock_t)(bool value);
  *
  ******************************************************************************/
 
-typedef void (*SHIFTPISO_hal_set_latch_shift_t)(bool value);
+typedef void (*SHIFTPISO_hal_set_latch_shift_t)(bool);
 
 /*******************************************************************************
  *
@@ -10035,7 +10314,7 @@ SHIFTSIPO_error_flags_t;
  *
  ******************************************************************************/
 
-typedef void (*SHIFTSIPO_pre_task_callback_t)(uint32_t context);
+typedef void (*SHIFTSIPO_pre_task_callback_t)(uint32_t);
 
 /*******************************************************************************
  *
@@ -10054,7 +10333,7 @@ typedef void (*SHIFTSIPO_pre_task_callback_t)(uint32_t context);
  *
  ******************************************************************************/
 
-typedef void (*SHIFTSIPO_post_task_callback_t)(uint32_t context);
+typedef void (*SHIFTSIPO_post_task_callback_t)(uint32_t);
 
 /*******************************************************************************
  *
@@ -10073,7 +10352,7 @@ typedef void (*SHIFTSIPO_post_task_callback_t)(uint32_t context);
  *
  ******************************************************************************/
 
-typedef void (*SHIFTSIPO_hal_set_shift_clock_t)(bool value);
+typedef void (*SHIFTSIPO_hal_set_shift_clock_t)(bool);
 
 /*******************************************************************************
  *
@@ -10092,7 +10371,7 @@ typedef void (*SHIFTSIPO_hal_set_shift_clock_t)(bool value);
  *
  ******************************************************************************/
 
-typedef void (*SHIFTSIPO_hal_set_register_clock_t)(bool value);
+typedef void (*SHIFTSIPO_hal_set_register_clock_t)(bool);
 
 /*******************************************************************************
  *
@@ -10111,7 +10390,7 @@ typedef void (*SHIFTSIPO_hal_set_register_clock_t)(bool value);
  *
  ******************************************************************************/
 
-typedef void (*SHIFTSIPO_hal_set_serial_t)(bool value);
+typedef void (*SHIFTSIPO_hal_set_serial_t)(bool);
 
 /*******************************************************************************
  *
@@ -10354,7 +10633,7 @@ extern "C" {
  *
  ******************************************************************************/
 
-typedef bool (*TERMENU_entry_handler_leaf_t)(uint32_t context);
+typedef bool (*TERMENU_entry_handler_leaf_t)(uint32_t);
 
 /*******************************************************************************
  *
@@ -10670,7 +10949,7 @@ extern "C" {
  *
  ******************************************************************************/
 
-typedef bool (*TERVAR_hal_var_read_handler_t)(void* entry);
+typedef bool (*TERVAR_hal_var_read_handler_t)(void*);
 
 /*******************************************************************************
  *
@@ -10697,7 +10976,7 @@ typedef bool (*TERVAR_hal_var_read_handler_t)(void* entry);
  *
  ******************************************************************************/
 
-typedef bool (*TERVAR_hal_var_write_handler_t)(void* entry);
+typedef bool (*TERVAR_hal_var_write_handler_t)(void*);
 
 /*******************************************************************************
  *
@@ -11615,7 +11894,7 @@ WS2812_error_flags_t;
  *
  ******************************************************************************/
 
-typedef void (*WS2812_pre_task_callback_t)(uint32_t context);
+typedef void (*WS2812_pre_task_callback_t)(uint32_t);
 
 /*******************************************************************************
  *
@@ -11634,7 +11913,7 @@ typedef void (*WS2812_pre_task_callback_t)(uint32_t context);
  *
  ******************************************************************************/
 
-typedef void (*WS2812_post_task_callback_t)(uint32_t context);
+typedef void (*WS2812_post_task_callback_t)(uint32_t);
 
 /*******************************************************************************
  *
@@ -11659,7 +11938,7 @@ typedef void (*WS2812_post_task_callback_t)(uint32_t context);
  *
  ******************************************************************************/
 
-typedef bool (*WS2812_hal_configure_dma_t)(void* src_addr, uint32_t src_length);
+typedef bool (*WS2812_hal_configure_dma_t)(void*, uint32_t);
 
 /*******************************************************************************
  *
