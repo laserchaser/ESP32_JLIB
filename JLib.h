@@ -698,7 +698,7 @@ extern "C" {
  * disable a transaction on timeout.
  */
 
-#define SERI2C_TIMOEOUT_DEFAULT_uS        100000U
+#define SERI2C_TIMEOUT_DEFAULT_uS         100000U
 #define SERI2C_TIMEOUT_DISABLED_uS        0U
 
 /*
@@ -1224,10 +1224,6 @@ typedef void (*SERI2C_hal_new_task_reset_t)(void);
  * tx_element_counter
  *  Number of elements which have been transmitted during the TX transaction.
  *
- * tx_lead_over_rx_counter
- *  Keeps track of the number of Tx elements over Rx elements. Incremented for
- *  every Tx element and decremented for every Rx element.
- *
  * *_hal_*
  *  User-provided functions. See typedef comments.
  *
@@ -1508,6 +1504,860 @@ bool SERI2C_is_busy(SERI2C_instance_t* instance);
 }
 #endif
 #endif // SER_I2C_J_H
+
+/*******************************************************************************
+ *
+ *  I2C Batch master module. Supports both 7-bit and 10-bit addressing.
+ *
+ ******************************************************************************/
+
+#ifndef SER_I2CBAT_J_H
+#define SER_I2CBAT_J_H
+
+// Support C++ builds.
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/*
+ * The default timeout between data transactions which will cause the
+ * transaction to abort. (Essentially, a watchdog). A timeout value of 0 will
+ * disable a transaction on timeout.
+ */
+
+#define SERI2CBAT_TIMEOUT_DEFAULT_uS      100000U
+#define SERI2CBAT_TIMEOUT_DISABLED_uS     0U
+
+/*
+ * Define bit-masks for the 7-bit and 10-bit slave address types.
+ */
+
+#define SERI2CBAT_7BIT_ADDRESS_MASK       0x007FU
+#define SERI2CBAT_10BIT_ADDRESS_MASK      0x03FFU
+
+/*******************************************************************************
+ *
+ * SERI2CBAT_flags_t
+ *
+ * DESCRIPTION:
+ *  Module flags.
+ *
+ * busy
+ *  Set when there is an active transaction. Cleared when the transaction
+ *  is completed.
+ *
+ * executing_batch
+ *  Set when a batch of commands are being executed.
+ *
+ * restart_required
+ *  Set if the transaction requires a restart transition between writing and
+ *  reading.
+ *
+ * task_state
+ *  State machine state.
+ *
+ ******************************************************************************/
+
+typedef union
+{
+  uint8_t all;
+  struct
+  {
+    uint8_t busy                          : 1;
+    uint8_t executing_batch               : 1;
+    uint8_t restart_required              : 1;
+    uint8_t reserved3                     : 1;
+    uint8_t task_state                    : 4;
+  };
+}
+SERI2CBAT_flags_t;
+
+/*******************************************************************************
+ *
+ * SERI2CBAT_error_flags_t
+ *
+ * DESCRIPTION:
+ *  Module error flags.
+ *
+ * timeout
+ *  The maximum allowable time between receiving or transmitting the next data
+ *  element has passed.
+ *
+ * nak_response
+ *  Slave device responded with a NACK causing the transaction to be cut short.
+ *
+ * collision
+ *  Collision detected on the I2C line.
+ *
+ * rx_overflow
+ *  Receive buffer overflow.
+ *
+ * other
+ *  All other types of errors.
+ *
+ ******************************************************************************/
+
+typedef union
+{
+  uint8_t all;
+  struct
+  {
+    uint8_t timeout                       : 1;
+    uint8_t nak_response                  : 1;
+    uint8_t collision                     : 1;
+    uint8_t rx_overflow                   : 1;
+    uint8_t other                         : 1;
+    uint8_t reserved5                     : 3;
+  };
+}
+SERI2CBAT_error_flags_t;
+
+/*******************************************************************************
+ *
+ * SERI2CBAT_hal_is_rx_ready_t
+ *
+ * DESCRIPTION:
+ *  Hardware abstraction layer function template for a user-provided function
+ *  which will check if the hardware Rx buffer has data available.
+ *
+ * RETURN:
+ *  True if the hardware Rx buffer has data available, else, false.
+ *
+ * NOTES:
+ *  Can be initialized as NULL - NO
+ *
+ ******************************************************************************/
+
+typedef bool (*SERI2CBAT_hal_is_rx_ready_t)(void);
+
+/*******************************************************************************
+ *
+ * SERI2CBAT_hal_is_tx_ready_t
+ *
+ * DESCRIPTION:
+ *  Hardware abstraction layer function template for a user-provided function
+ *  which will check if the hardware Tx buffer has room available.
+ *
+ * RETURN:
+ *  True if the hardware Tx buffer has room available, else, false.
+ *
+ * NOTES:
+ *  Can be initialized as NULL - NO
+ *
+ ******************************************************************************/
+
+typedef bool (*SERI2CBAT_hal_is_tx_ready_t)(void);
+
+/*******************************************************************************
+ *
+ * SERI2CBAT_hal_read_rx_register_t
+ *
+ * DESCRIPTION:
+ *  Hardware abstraction layer function template for a user-provided function
+ *  which will read the next available element from the hardware Rx buffer.
+ *
+ * RETURN:
+ *  The next read element from the Rx hardware buffer.
+ *
+ * NOTES:
+ *  Can be initialized as NULL - NO
+ *
+ ******************************************************************************/
+
+typedef uint8_t (*SERI2CBAT_hal_read_rx_register_t)(void);
+
+/*******************************************************************************
+ *
+ * SERI2CBAT_hal_write_tx_register_t
+ *
+ * DESCRIPTION:
+ *  Hardware abstraction layer function template for a user-provided function
+ *  which will write a value to the hardware Tx buffer.
+ *
+ * PARAMETERS:
+ *  value
+ *   Element to be written to the hardware Tx buffer.
+ *
+ * NOTES:
+ *  Can be initialized as NULL - NO
+ *
+ ******************************************************************************/
+
+typedef void (*SERI2CBAT_hal_write_tx_register_t)(uint8_t);
+
+/*******************************************************************************
+ *
+ * SERI2CBAT_hal_enqueue_start_command_t
+ *
+ * DESCRIPTION:
+ *  Hardware abstraction layer function template for a user-provided function
+ *  which will enqueue the start command.
+ *
+ * PARAMETERS:
+ *  index
+ *   The next batch queue index.
+ *
+ * NOTES:
+ *  Can be initialized as NULL - NO
+ *
+ ******************************************************************************/
+
+typedef void (*SERI2CBAT_hal_enqueue_start_command_t)(uint8_t);
+
+/*******************************************************************************
+ *
+ * SERI2CBAT_hal_enqueue_restart_command_t
+ *
+ * DESCRIPTION:
+ *  Hardware abstraction layer function template for a user-provided function
+ *  which will enqueue the restart command.
+ *
+ * PARAMETERS:
+ *  index
+ *   The next batch queue index.
+ *
+ * NOTES:
+ *  Can be initialized as NULL - NO
+ *
+ ******************************************************************************/
+
+typedef void (*SERI2CBAT_hal_enqueue_restart_command_t)(uint8_t);
+
+/*******************************************************************************
+ *
+ * SERI2CBAT_hal_enqueue_read_command_t
+ *
+ * DESCRIPTION:
+ *  Hardware abstraction layer function template for a user-provided function
+ *  which will enqueue the read command.
+ *
+ * PARAMETERS:
+ *  index
+ *   The next batch queue index.
+ *
+ *  length
+ *   The length, in bytes, to read.
+ *
+ *  ack_response
+ *   Indicates if the byte(s) associated with this command read shoul return
+ *   an ACK (true) or NAK (false) response. If the total number of bytes to
+ *   read is greater than 1, this module will always enqueue a separate read
+ *   command for the last byte by itself with this argument false (NAK).
+ *
+ * NOTES:
+ *  Can be initialized as NULL - NO
+ *
+ ******************************************************************************/
+
+typedef void (*SERI2CBAT_hal_enqueue_read_command_t)(uint8_t, uint16_t, bool);
+
+/*******************************************************************************
+ *
+ * SERI2CBAT_hal_enqueue_write_command_t
+ *
+ * DESCRIPTION:
+ *  Hardware abstraction layer function template for a user-provided function
+ *  which will enqueue the write command.
+ *
+ * PARAMETERS:
+ *  index
+ *   The next batch queue index.
+ *
+ *  length
+ *   The length, in bytes, to write.
+ *
+ * NOTES:
+ *  Can be initialized as NULL - NO
+ *
+ ******************************************************************************/
+
+typedef void (*SERI2CBAT_hal_enqueue_write_command_t)(uint8_t, uint16_t);
+
+/*******************************************************************************
+ *
+ * SERI2CBAT_hal_enqueue_end_command_t
+ *
+ * DESCRIPTION:
+ *  Hardware abstraction layer function template for a user-provided function
+ *  which will enqueue the 'end' command. (This is a command which indicates
+ *  an end of the current batch but not an end to the data transaction. It
+ *  lets the system know another batch will be enqueued and executed soon.)
+ *
+ * PARAMETERS:
+ *  index
+ *   The next batch queue index.
+ *
+ * NOTES:
+ *  Can be initialized as NULL - NO
+ *
+ ******************************************************************************/
+
+typedef void (*SERI2CBAT_hal_enqueue_end_command_t)(uint8_t);
+
+/*******************************************************************************
+ *
+ * SERI2CBAT_hal_enqueue_stop_command_t
+ *
+ * DESCRIPTION:
+ *  Hardware abstraction layer function template for a user-provided function
+ *  which will enqueue the stop command.
+ *
+ * PARAMETERS:
+ *  index
+ *   The next batch queue index.
+ *
+ * NOTES:
+ *  Can be initialized as NULL - NO
+ *
+ ******************************************************************************/
+
+typedef void (*SERI2CBAT_hal_enqueue_stop_command_t)(uint8_t);
+
+/*******************************************************************************
+ *
+ * SERI2CBAT_hal_trigger_batch_execute_t
+ *
+ * DESCRIPTION:
+ *  Hardware abstraction layer function template for a user-provided function
+ *  which will begin execution of the batch commands.
+ *
+ * NOTES:
+ *  Can be initialized as NULL - NO
+ *
+ ******************************************************************************/
+
+typedef void (*SERI2CBAT_hal_trigger_batch_execute_t)(void);
+
+/*******************************************************************************
+ *
+ * SERI2CBAT_hal_trigger_batch_abort_t
+ *
+ * DESCRIPTION:
+ *  Hardware abstraction layer function template for a user-provided function
+ *  which will abort batch execution and clear the command queue.
+ *
+ * NOTES:
+ *  Can be initialized as NULL - NO
+ *
+ ******************************************************************************/
+
+typedef void (*SERI2CBAT_hal_trigger_batch_abort_t)(void);
+
+/*******************************************************************************
+ *
+ * SERI2CBAT_hal_is_batch_completed_t
+ *
+ * DESCRIPTION:
+ *  Hardware abstraction layer function template for a user-provided function
+ *  which will determine if the batch operation has finished.
+ *
+ * PARAMETERS:
+ *  index
+ *   The index of the last command in the batch queue.
+ *
+ * RETURN:
+ *  True if the the batch has finished, else, false;
+ *
+ * NOTES:
+ *  Can be initialized as NULL - NO
+ *
+ ******************************************************************************/
+
+typedef bool (*SERI2CBAT_hal_is_batch_completed_t)(uint8_t);
+
+/*******************************************************************************
+ *
+ * SERI2CBAT_hal_error_check_nak_received_t
+ *
+ * DESCRIPTION:
+ *  Hardware abstraction layer function template for a user-provided function
+ *  which will determine if an NAK response has been received. (Not always an
+ *  error.)
+ *
+ * RETURN:
+ *  True if an NAK has been received, else, false;
+ *
+ * NOTES:
+ *  Can be initialized as NULL - NO
+ *
+ ******************************************************************************/
+
+typedef bool (*SERI2CBAT_hal_error_check_nak_received_t)(void);
+
+/*******************************************************************************
+ *
+ * SERI2CBAT_hal_error_check_collision_t
+ *
+ * DESCRIPTION:
+ *  Hardware abstraction layer function template for a user-provided function
+ *  which will determine if a collision on the bus has been detected.
+ *
+ * RETURN:
+ *  True if a collision was detected, else, false;
+ *
+ * NOTES:
+ *  Can be initialized as NULL - YES
+ *
+ ******************************************************************************/
+
+typedef bool (*SERI2CBAT_hal_error_check_collision_t)(void);
+
+/*******************************************************************************
+ *
+ * SERI2CBAT_hal_error_check_rx_overflow_t
+ *
+ * DESCRIPTION:
+ *  Hardware abstraction layer function template for a user-provided function
+ *  which will determine if a receive buffer overflow has been detected.
+ *
+ * RETURN:
+ *  True if a receive buffer overflow was detected, else, false;
+ *
+ * NOTES:
+ *  Can be initialized as NULL - YES
+ *
+ ******************************************************************************/
+
+typedef bool (*SERI2CBAT_hal_error_check_rx_overflow_t)(void);
+
+/*******************************************************************************
+ *
+ * SERI2CBAT_hal_error_check_other_t
+ *
+ * DESCRIPTION:
+ *  Hardware abstraction layer function template for a user-provided function
+ *  which will determine if any other type of error has been detected.
+ *
+ * RETURN:
+ *  True if any other type of error was detected, else, false;
+ *
+ * NOTES:
+ *  Can be initialized as NULL - YES
+ *
+ ******************************************************************************/
+
+typedef bool (*SERI2CBAT_hal_error_check_other_t)(void);
+
+/*******************************************************************************
+ *
+ * SERI2CBAT_hal_clear_errors_t
+ *
+ * DESCRIPTION:
+ *  Hardware abstraction layer function template for a user-provided function
+ *  which will clear all I2C errors.
+ *
+ * NOTES:
+ *  Can be initialized as NULL - YES
+ *
+ ******************************************************************************/
+
+typedef void (*SERI2CBAT_hal_clear_errors_t)(void);
+
+/*******************************************************************************
+ *
+ * SERI2CBAT_hal_new_task_reset_t
+ *
+ * DESCRIPTION:
+ *  Hardware abstraction layer function template for a user-provided function
+ *  which will clear or reset various registers in preparation for a new task.
+ *  (Eg. FIFO, FSM, etc...)
+ *
+ * NOTES:
+ *  Can be initialized as NULL - YES
+ *
+ ******************************************************************************/
+
+typedef void (*SERI2CBAT_hal_new_task_reset_t)(void);
+
+/*******************************************************************************
+ *
+ * SERI2CBAT_instance_t
+ *
+ * DESCRIPTION:
+ *  Instance data and function pointers.
+ *
+ * flags
+ *  Module flags.
+ *
+ * errors
+ *  Module error flags.
+ *
+ * utimer
+ *  User-provided initialized instance of a UTIMER.
+ *
+ * utimer_ticket
+ *  Data structure used with the UTIMER instance.
+ *
+ * register_length
+ *  The length, in bytes, up to the byte-length of the register parameter, that
+ *  make up the real register value which needs to be transmitted.
+ *
+ * cmd_queue_length
+ *  The length, in number of commands, which can be enqueued for a single
+ *  batch transaction. Must be at least 2 to allow at least one command
+ *  for a continuing transaction followed by the 'end' command.
+ *
+ * cmd_queue_counter
+ *  Number of enqueued commands.
+ *
+ * addr_reg_buffer_length
+ *  Number of bytes to write in the addr_reg buffer.
+ *
+ * addr_reg_buffer
+ *  Holds the slave address and register write information. This is a maximum
+ *  of 6-bytes (2 for the slave address and 4 for the register).
+ *
+ * cmd_rw_length
+ *  The length, in bytes, which can be read or written for a single read/write
+ *  command. Must be at least 4 to allow the maximum supported register size
+ *  for a single write command.
+ *
+ * slave_address
+ *  Stores the slave address of the current slave device.
+ *
+ * rx_buffer
+ *  Element buffer which will hold the element data from the RX transaction.
+ *
+ * tx_buffer
+ *  Element buffer which contains the element data for the TX transaction.
+ *
+ * register_value
+ *  Stores the register offset value of the current slave device if this is a
+ *  register read or write operation.
+ *
+ * timeout_us
+ *  Value which will be loaded into the utimer_ticket. Initialized to the
+ *  module default but can be modified by the user.
+ *
+ * buffered_bytes_per_iteration
+ *  Maximum number of bytes that will be written to the hardware TX buffer
+ *  or read from the hardware RX buffer per iteration.
+ *
+ * batch_rx_element_count
+ *  Number of elements to be received in the current RX batch.
+ *
+ * batch_tx_element_count
+ *  Number of elements to be transmitted in the current TX batch.
+ *
+ * batch_rx_element_counter
+ *  Number of elements which have been received during the current RX batch.
+ *
+ * batch_tx_element_counter
+ *  Number of elements which have been transmitted during the current TX batch.
+ *
+ * rx_element_count
+ *  Number of elements to be received in the entire RX transaction.
+ *
+ * tx_element_count
+ *  Number of elements to be transmitted in the entire TX transaction.
+ *
+ * rx_element_counter
+ *  Number of elements which have been received during the RX transaction.
+ *
+ * tx_element_counter
+ *  Number of elements which have been transmitted during the TX transaction.
+ *
+ * rx_element_enqueued_counter
+ *  Number of elements which have been enqueued to be received during the
+ *  RX transaction.
+ *
+ * tx_element_enqueued_counter
+ *  Number of elements which have been enqueued to be be transmitted during
+ *  the TX transaction.
+ *
+ * *_hal_*
+ *  User-provided functions. See typedef comments.
+ *
+ ******************************************************************************/
+
+typedef struct
+{
+  SERI2CBAT_flags_t flags;
+  SERI2CBAT_error_flags_t errors;
+  UTIMER_instance_t* utimer;
+  UTIMER_ticket_t utimer_ticket;
+  uint8_t register_length;
+  uint8_t cmd_queue_length;
+  uint8_t cmd_queue_counter;
+  uint8_t re_addr_buffer_count;
+  uint8_t re_addr_buffer_counter;
+  uint8_t re_addr_buffer;
+  uint8_t addr_reg_buffer_count;
+  uint8_t addr_reg_buffer_counter;
+  uint8_t addr_reg_buffer[6];
+  uint16_t cmd_rw_length;
+  uint16_t slave_address;
+  uint8_t* rx_buffer;
+  uint8_t* tx_buffer;
+  uint32_t register_value;
+  uint32_t timeout_us;
+  uint32_t buffered_bytes_per_iteration;
+  uint32_t batch_rx_element_count;
+  uint32_t batch_tx_element_count;
+  uint32_t batch_rx_element_counter;
+  uint32_t batch_tx_element_counter;
+  uint32_t rx_element_count;
+  uint32_t tx_element_count;
+  uint32_t rx_element_counter;
+  uint32_t tx_element_counter;
+  uint32_t rx_element_enqueued_counter;
+  uint32_t tx_element_enqueued_counter;
+  SERI2CBAT_hal_is_rx_ready_t is_rx_ready;
+  SERI2CBAT_hal_is_tx_ready_t is_tx_ready;
+  SERI2CBAT_hal_read_rx_register_t read_rx_register;
+  SERI2CBAT_hal_write_tx_register_t write_tx_register;
+  SERI2CBAT_hal_enqueue_start_command_t enqueue_start_command;
+  SERI2CBAT_hal_enqueue_restart_command_t enqueue_restart_command;
+  SERI2CBAT_hal_enqueue_read_command_t enqueue_read_command;
+  SERI2CBAT_hal_enqueue_write_command_t enqueue_write_command;
+  SERI2CBAT_hal_enqueue_end_command_t enqueue_end_command;
+  SERI2CBAT_hal_enqueue_stop_command_t enqueue_stop_command;
+  SERI2CBAT_hal_trigger_batch_execute_t trigger_batch_execute;
+  SERI2CBAT_hal_trigger_batch_abort_t trigger_batch_abort;
+  SERI2CBAT_hal_is_batch_completed_t is_batch_completed;
+  SERI2CBAT_hal_error_check_nak_received_t error_check_nak_received;
+  SERI2CBAT_hal_error_check_collision_t error_check_collision;
+  SERI2CBAT_hal_error_check_rx_overflow_t error_check_rx_overflow;
+  SERI2CBAT_hal_error_check_other_t error_check_other;
+  SERI2CBAT_hal_clear_errors_t clear_errors;
+  SERI2CBAT_hal_new_task_reset_t new_task_reset;
+}
+SERI2CBAT_instance_t;
+
+/*******************************************************************************
+ *
+ * SERI2CBAT_initialize
+ *
+ * DESCRIPTION:
+ *  Initializes a module instance, erasing all data structures and setting
+ *  default values.
+ *
+ * PARAMETERS:
+ *  See SERI2CBAT_instance_t.
+ *
+ ******************************************************************************/
+
+void SERI2CBAT_initialize(SERI2CBAT_instance_t* instance,
+                          UTIMER_instance_t* utimer,
+                          uint8_t cmd_queue_length,
+                          uint16_t cmd_rw_length,
+                          uint32_t buffered_bytes_per_iteration,
+                          SERI2CBAT_hal_is_rx_ready_t is_rx_ready,
+                          SERI2CBAT_hal_is_tx_ready_t is_tx_ready,
+                          SERI2CBAT_hal_read_rx_register_t read_rx_register,
+                          SERI2CBAT_hal_write_tx_register_t write_tx_register,
+                          SERI2CBAT_hal_enqueue_start_command_t enqueue_start_command,
+                          SERI2CBAT_hal_enqueue_restart_command_t enqueue_restart_command,
+                          SERI2CBAT_hal_enqueue_read_command_t enqueue_read_command,
+                          SERI2CBAT_hal_enqueue_write_command_t enqueue_write_command,
+                          SERI2CBAT_hal_enqueue_end_command_t enqueue_end_command,
+                          SERI2CBAT_hal_enqueue_stop_command_t enqueue_stop_command,
+                          SERI2CBAT_hal_trigger_batch_execute_t trigger_batch_execute,
+                          SERI2CBAT_hal_trigger_batch_abort_t trigger_batch_abort,
+                          SERI2CBAT_hal_is_batch_completed_t is_batch_completed,
+                          SERI2CBAT_hal_error_check_nak_received_t error_check_nak_received,
+                          SERI2CBAT_hal_error_check_collision_t error_check_collision,
+                          SERI2CBAT_hal_error_check_rx_overflow_t error_check_rx_overflow,
+                          SERI2CBAT_hal_error_check_other_t error_check_other,
+                          SERI2CBAT_hal_clear_errors_t clear_errors,
+                          SERI2CBAT_hal_new_task_reset_t new_task_reset);
+
+/*******************************************************************************
+ *
+ * SERI2CBAT_set_transaction_timeout
+ *
+ * DESCRIPTION:
+ *  Sets the transaction timeout value. Every time an element is received or
+ *  transmitted the timeout timer will be reset with this value. If a timeout
+ *  occurs, the operation is aborted.
+ *
+ * PARAMETERS:
+ *  timeout_us
+ *   Timeout to set in microseconds.
+ *
+ ******************************************************************************/
+
+void SERI2CBAT_set_transaction_timeout(SERI2CBAT_instance_t* instance,
+                                       uint32_t timeout_us);
+
+/*******************************************************************************
+ *
+ * SERI2CBAT_begin_new_write_read
+ *
+ * DESCRIPTION:
+ *  Attempts to begin a new write task followed by a read task. The request
+ *  will be accepted if the instance is not currently busy with a task.
+ *
+ * PARAMETERS:
+ *  slave_address
+ *   I2C hardware address of the slave device. Can either be 7-bit or 10-bit.
+ *
+ *  tx_buffer
+ *   Buffer which contains the data to be written to the slave device.
+ *
+ *  tx_length
+ *   Number of bytes to write. (Tx buffer must be this size or greater.)
+ *
+ *  rx_buffer
+ *   Buffer which will hold the data read from the slave device.
+ *
+ *  rx_length
+ *   Number of bytes to read. (Rx buffer must be this size or greater.)
+ *
+ * RETURN:
+ *  True if the task request was accepted, else, false.
+ *
+ ******************************************************************************/
+
+bool SERI2CBAT_begin_new_write_read(SERI2CBAT_instance_t* instance,
+                                    uint16_t slave_address,
+                                    uint8_t* tx_buffer,
+                                    uint32_t tx_length,
+                                    uint8_t* rx_buffer,
+                                    uint32_t rx_length);
+
+/*******************************************************************************
+ *
+ * SERI2CBAT_begin_new_read
+ *
+ * DESCRIPTION:
+ *  Attempts to begin a new read transaction. This can only be done if the
+ *  instance is currently not busy.
+ *
+ * PARAMETERS:
+ *  See SERI2CBAT_begin_new_write_read.
+ *
+ * RETURN:
+ *  True if the task request was accepted, else, false.
+ *
+ ******************************************************************************/
+
+bool SERI2CBAT_begin_new_read(SERI2CBAT_instance_t* instance,
+                              uint16_t slave_address,
+                              uint8_t* rx_buffer,
+                              uint32_t rx_length);
+
+/*******************************************************************************
+ *
+ * SERI2CBAT_begin_new_write
+ *
+ * DESCRIPTION:
+ *  Attempts to begin a new write transaction. This can only be done if the
+ *  instance is currently not busy.
+ *
+ * PARAMETERS:
+ *  See SERI2CBAT_begin_new_write_read.
+ *
+ * RETURN:
+ *  True if the task request was accepted, else, false.
+ *
+ ******************************************************************************/
+
+bool SERI2CBAT_begin_new_write(SERI2CBAT_instance_t* instance,
+                               uint16_t slave_address,
+                               uint8_t* tx_buffer,
+                               uint32_t tx_length);
+
+/*******************************************************************************
+ *
+ * SERI2CBAT_begin_new_register_read
+ *
+ * DESCRIPTION:
+ *  Attempts to begin a new register read transaction. This can only be done
+ *  if the instance is currently not busy.
+ *
+ * PARAMETERS:
+ *  See SERI2CBAT_begin_new_write_read.
+ *
+ *  register_value
+ *   The register value. This will be the first data written to the slave
+ *   after the slave is addressed for writing.
+ *
+ *  register_length
+ *   The length, in bytes, of the register value. This accomodates the possible
+ *   need for longer register requirements, such as EEPROM memory addressing.
+ *
+ * RETURN:
+ *  True if the task request was accepted, else, false.
+ *
+ ******************************************************************************/
+
+bool SERI2CBAT_begin_new_register_read(SERI2CBAT_instance_t* instance,
+                                       uint16_t slave_address,
+                                       uint32_t register_value,
+                                       uint8_t register_length,
+                                       uint8_t* rx_buffer,
+                                       uint32_t rx_length);
+
+/*******************************************************************************
+ *
+ * SERI2CBAT_begin_new_register_write
+ *
+ * DESCRIPTION:
+ *  Attempts to begin a new register write task. The request will be accepted
+ *  if the instance is not currently busy with a task.
+ *
+ * PARAMETERS:
+ *  See SERI2CBAT_begin_new_write_read.
+ *  See SERI2CBAT_begin_new_register_read.
+ *
+ * RETURN:
+ *  True if the task request was accepted, else, false.
+ *
+ ******************************************************************************/
+
+bool SERI2CBAT_begin_new_register_write(SERI2CBAT_instance_t* instance,
+                                        uint16_t slave_address,
+                                        uint32_t register_value,
+                                        uint8_t register_length,
+                                        uint8_t* tx_buffer,
+                                        uint32_t tx_length);
+
+/*******************************************************************************
+ *
+ * SERI2CBAT_service
+ *
+ * DESCRIPTION:
+ *  Services the task state machine. Must be called repeatedly until the task
+ *  is completed.
+ *
+ * RETURN:
+ *  False if there is an ongoing task which has not completed, else, true.
+ *
+ ******************************************************************************/
+
+bool SERI2CBAT_service(SERI2CBAT_instance_t* instance);
+
+/*******************************************************************************
+ *
+ * SERI2CBAT_abort
+ *
+ * DESCRIPTION:
+ *  Aborts the current task.
+ *
+ ******************************************************************************/
+
+void SERI2CBAT_abort(SERI2CBAT_instance_t* instance);
+
+/*******************************************************************************
+ *
+ * SERI2CBAT_is_busy
+ *
+ * DESCRIPTION:
+ *  Determines if an instance is currently busy with a task.
+ *
+ * RETURN:
+ *  True if the instance is busy with a task, else, false.
+ *
+ ******************************************************************************/
+
+bool SERI2CBAT_is_busy(SERI2CBAT_instance_t* instance);
+
+#ifdef __cplusplus
+}
+#endif
+#endif // SER_I2CBAT_J_H
 
 /*******************************************************************************
  *
