@@ -6134,21 +6134,21 @@ bool DMX512_is_busy(DMX512_instance_t* instance);
 
 /*******************************************************************************
  *
- *  EEPROM with I2C interface. Requires proper initialization and the service
- *  routine to be called repeatedly after a new task request until the task is
- *  completed.
+ *  EEPROM with generic HAL interface. Requires proper initialization and the
+ *  service routine to be called repeatedly after a new task request until the
+ *  task is completed.
  *
  *  While EEPROMs are built by several manufactures, most follow the same
  *  interface of a 2-4 byte address followed by a read or write operation. The
  *  maximum number of bytes that can be written per a single transaction is the
- *  size of the EEPROM page. Once the STOP condition is sent, the EEPROM needs
- *  time to commit the received data to NVM. A read operation does not have
- *  this same limitation and can span accross pages.
+ *  size of the EEPROM page. Once written, the EEPROM needs time to commit the
+ *  received data to NVM. A read operation does not have this same limitation
+ *  and can span accross pages.
  *
  ******************************************************************************/
 
-#ifndef EEPROMI2C_J_H
-#define EEPROMI2C_J_H
+#ifndef EEPROM_J_H
+#define EEPROM_J_H
 
 // Support C++ builds.
 
@@ -6158,7 +6158,7 @@ extern "C" {
 
 /*******************************************************************************
  *
- * EEPROMI2C_flags_t
+ * EEPROM_flags_t
  *
  * DESCRIPTION:
  *  Module flags.
@@ -6166,6 +6166,10 @@ extern "C" {
  * busy
  *  Set when the module is busy with a task and cleared when the task is
  *  completed.
+ *
+ * erase_task
+ *  Set if the current task is an erase task. Allows the erase task to utilize
+ *  the write service handler with minor differences.
  *
  * task_state
  *  State machine state.
@@ -6178,16 +6182,17 @@ typedef union
   struct
   {
     uint8_t busy                          : 1;
-    uint8_t reserved1                     : 3;
+    uint8_t erase_task                    : 1;
+    uint8_t reserved2                     : 2;
     uint8_t task_state                    : 3;
     uint8_t reserved7                     : 1;
   };
 }
-EEPROMI2C_flags_t;
+EEPROM_flags_t;
 
 /*******************************************************************************
  *
- * EEPROMI2C_pre_task_callback_t
+ * EEPROM_pre_task_callback_t
  *
  * DESCRIPTION:
  *  Function template for a user-provided function which is called when a new
@@ -6204,11 +6209,11 @@ EEPROMI2C_flags_t;
  *
  ******************************************************************************/
 
-typedef void (*EEPROMI2C_pre_task_callback_t)(uint32_t);
+typedef void (*EEPROM_pre_task_callback_t)(uint32_t);
 
 /*******************************************************************************
  *
- * EEPROMI2C_post_task_callback_t
+ * EEPROM_post_task_callback_t
  *
  * DESCRIPTION:
  *  Function template for a user-provided function which is called after a
@@ -6223,11 +6228,109 @@ typedef void (*EEPROMI2C_pre_task_callback_t)(uint32_t);
  *
  ******************************************************************************/
 
-typedef void (*EEPROMI2C_post_task_callback_t)(uint32_t);
+typedef void (*EEPROM_post_task_callback_t)(uint32_t);
 
 /*******************************************************************************
  *
- * EEPROMI2C_instance_t
+ * EEPROM_hal_driver_read_t
+ *
+ * DESCRIPTION:
+ *  Hardware abstraction layer function template for a user-provided function
+ *  which will read the EEPROM.
+ *
+ * PARAMETERS:
+ *  address
+ *   Starting memory address.
+ *
+ *  address_reg_length
+ *   The length, in bytes, of the memory address or register.
+ *
+ *  buffer
+ *   Buffer which will hold the read data.
+ *
+ *  length
+ *   The length, in bytes, of data to read.
+ *
+ * RETURN:
+ *  True if the task request was accepted, else, false.
+ *
+ * NOTES:
+ *  Can be initialized as NULL - NO
+ *
+ ******************************************************************************/
+
+typedef bool (*EEPROM_hal_driver_read_t)(uint32_t, uint8_t, uint8_t*, uint32_t);
+
+/*******************************************************************************
+ *
+ * EEPROM_hal_driver_write_t
+ *
+ * DESCRIPTION:
+ *  Hardware abstraction layer function template for a user-provided function
+ *  which will write the EEPROM.
+ *
+ * PARAMETERS:
+ *  address
+ *   Starting memory address.
+ *
+ *  address_reg_length
+ *   The length, in bytes, of the memory address or register.
+ *
+ *  buffer
+ *   Buffer which holds the data to be written.
+ *
+ *  length
+ *   The length, in bytes, of data to write.
+ *
+ * RETURN:
+ *  True if the task request was accepted, else, false.
+ *
+ * NOTES:
+ *  Can be initialized as NULL - NO
+ *
+ ******************************************************************************/
+
+typedef bool (*EEPROM_hal_driver_write_t)(uint32_t, uint8_t, uint8_t*, uint32_t);
+
+/*******************************************************************************
+ *
+ * EEPROM_hal_driver_service_t
+ *
+ * DESCRIPTION:
+ *  Hardware abstraction layer function template for a user-provided function
+ *  which will service the driver.
+ *
+ * RETURN:
+ *  False if there is an ongoing task which has not completed, else, true.
+ *
+ * NOTES:
+ *  Can be initialized as NULL - NO
+ *
+ ******************************************************************************/
+
+typedef bool (*EEPROM_hal_driver_service_t)(void);
+
+/*******************************************************************************
+ *
+ * EEPROM_hal_driver_timeout_t
+ *
+ * DESCRIPTION:
+ *  Hardware abstraction layer function template for a user-provided function
+ *  which will determine if the driver has had a task timeout.
+ *
+ * RETURN:
+ *  True if a timeout has occurred, else, false.
+ *
+ * NOTES:
+ *  Can be initialized as NULL - NO
+ *
+ ******************************************************************************/
+
+typedef bool (*EEPROM_hal_driver_timeout_t)(void);
+
+/*******************************************************************************
+ *
+ * EEPROM_instance_t
  *
  * DESCRIPTION:
  *  Instance data and function pointers.
@@ -6237,9 +6340,6 @@ typedef void (*EEPROMI2C_post_task_callback_t)(uint32_t);
  *
  * utimer
  *  User-provided initialized instance of a UTIMER.
- *
- * i2c
- *  User-provided initialized instance of a SERI2C.
  *
  * utimer_ticket
  *  Data structure used with the UTIMER instance.
@@ -6251,10 +6351,7 @@ typedef void (*EEPROMI2C_post_task_callback_t)(uint32_t);
  *  The BUS ID associated with the BUSMUTEX instance.
  *
  * address_reg_length
- *  The length, in bytes, of the address register field in the I2C transmission.
- *
- * slave_address
- *  The I2C slave address of the EEPROM device.
+ *  The length, in bytes, of the EEPROM address/register.
  *
  * page_length
  *  The length, in bytes, of a single EEPROM page.
@@ -6290,18 +6387,19 @@ typedef void (*EEPROMI2C_post_task_callback_t)(uint32_t);
  * *_task_*
  *  User-provided functions. See typedef comments.
  *
+ * *_hal_*
+ *  User-provided functions. See typedef comments.
+ *
  ******************************************************************************/
 
 typedef struct
 {
-  EEPROMI2C_flags_t flags;
+  EEPROM_flags_t flags;
   UTIMER_instance_t* utimer;
-  SERI2C_instance_t* i2c;
   UTIMER_ticket_t utimer_ticket;
   BUSMUTEX_instance_t* bus_mutex;
   BUSMUTEX_bus_id_t bus_id;
   uint8_t address_reg_length;
-  uint16_t slave_address;
   uint16_t page_length;
   uint32_t total_length;
   uint8_t* buffer;
@@ -6311,40 +6409,46 @@ typedef struct
   uint32_t page_commit_timeout_us;
   uint32_t callback_context;
   bool (*service_handler)(void* instance);
-  EEPROMI2C_pre_task_callback_t pre_task_callback;
-  EEPROMI2C_post_task_callback_t post_task_callback;
+  EEPROM_pre_task_callback_t pre_task_callback;
+  EEPROM_post_task_callback_t post_task_callback;
+  EEPROM_hal_driver_read_t driver_read;
+  EEPROM_hal_driver_write_t driver_write;
+  EEPROM_hal_driver_service_t driver_service;
+  EEPROM_hal_driver_timeout_t driver_timeout;
 }
-EEPROMI2C_instance_t;
+EEPROM_instance_t;
 
 /*******************************************************************************
  *
- * EEPROMI2C_initialize
+ * EEPROM_initialize
  *
  * DESCRIPTION:
  *  Initializes a module instance, erasing all data structures and setting
  *  default values.
  *
  * PARAMETERS:
- *  See EEPROMI2C_instance_t.
+ *  See EEPROM_instance_t.
  *
  ******************************************************************************/
 
-void EEPROMI2C_initialize(EEPROMI2C_instance_t* instance,
-                          UTIMER_instance_t* utimer,
-                          SERI2C_instance_t* i2c,
-                          BUSMUTEX_instance_t* bus_mutex,
-                          BUSMUTEX_bus_id_t bus_id,
-                          uint8_t address_reg_length,
-                          uint16_t slave_address,
-                          uint16_t page_length,
-                          uint32_t total_length,
-                          uint32_t page_commit_timeout_us,
-                          EEPROMI2C_pre_task_callback_t pre_task_callback,
-                          EEPROMI2C_post_task_callback_t post_task_callback);
+void EEPROM_initialize(EEPROM_instance_t* instance,
+                       UTIMER_instance_t* utimer,
+                       BUSMUTEX_instance_t* bus_mutex,
+                       BUSMUTEX_bus_id_t bus_id,
+                       uint8_t address_reg_length,
+                       uint16_t page_length,
+                       uint32_t total_length,
+                       uint32_t page_commit_timeout_us,
+                       EEPROM_pre_task_callback_t pre_task_callback,
+                       EEPROM_post_task_callback_t post_task_callback,
+                       EEPROM_hal_driver_read_t driver_read,
+                       EEPROM_hal_driver_write_t driver_write,
+                       EEPROM_hal_driver_service_t driver_service,
+                       EEPROM_hal_driver_timeout_t driver_timeout);
 
 /*******************************************************************************
  *
- * EEPROMI2C_purge
+ * EEPROM_purge
  *
  * DESCRIPTION:
  *  Attempts to begin a new EEPROM erase task with the address range of the
@@ -6355,11 +6459,11 @@ void EEPROMI2C_initialize(EEPROMI2C_instance_t* instance,
  *
  ******************************************************************************/
 
-bool EEPROMI2C_purge(EEPROMI2C_instance_t* instance);
+bool EEPROM_purge(EEPROM_instance_t* instance);
 
 /*******************************************************************************
  *
- * EEPROMI2C_erase
+ * EEPROM_erase
  *
  * DESCRIPTION:
  *  Attempts to begin a new EEPROM erase task.
@@ -6376,13 +6480,13 @@ bool EEPROMI2C_purge(EEPROMI2C_instance_t* instance);
  *
  ******************************************************************************/
 
-bool EEPROMI2C_erase(EEPROMI2C_instance_t* instance,
-                     uint32_t start_address,
-                     uint32_t length);
+bool EEPROM_erase(EEPROM_instance_t* instance,
+                  uint32_t start_address,
+                  uint32_t length);
 
 /*******************************************************************************
  *
- * EEPROMI2C_begin_new_write
+ * EEPROM_begin_new_write
  *
  * DESCRIPTION:
  *  Attempts to begin a new EEPROM write task.
@@ -6402,14 +6506,14 @@ bool EEPROMI2C_erase(EEPROMI2C_instance_t* instance,
  *
  ******************************************************************************/
 
-bool EEPROMI2C_begin_new_write(EEPROMI2C_instance_t* instance,
-                               uint32_t start_address,
-                               uint8_t* buffer,
-                               uint32_t length);
+bool EEPROM_begin_new_write(EEPROM_instance_t* instance,
+                            uint32_t start_address,
+                            uint8_t* buffer,
+                            uint32_t length);
 
 /*******************************************************************************
  *
- * EEPROMI2C_begin_new_read
+ * EEPROM_begin_new_read
  *
  * DESCRIPTION:
  *  Attempts to begin a new EEPROM read task.
@@ -6429,14 +6533,14 @@ bool EEPROMI2C_begin_new_write(EEPROMI2C_instance_t* instance,
  *
  ******************************************************************************/
 
-bool EEPROMI2C_begin_new_read(EEPROMI2C_instance_t* instance,
-                               uint32_t start_address,
-                               uint8_t* buffer,
-                               uint32_t length);
+bool EEPROM_begin_new_read(EEPROM_instance_t* instance,
+                           uint32_t start_address,
+                           uint8_t* buffer,
+                           uint32_t length);
 
 /*******************************************************************************
  *
- * EEPROMI2C_service
+ * EEPROM_service
  *
  * DESCRIPTION:
  *  Services the task state machine. Must be called repeatedly until the task
@@ -6447,11 +6551,11 @@ bool EEPROMI2C_begin_new_read(EEPROMI2C_instance_t* instance,
  *
  ******************************************************************************/
 
-bool EEPROMI2C_service(EEPROMI2C_instance_t* instance);
+bool EEPROM_service(EEPROM_instance_t* instance);
 
 /*******************************************************************************
  *
- * EEPROMI2C_is_busy
+ * EEPROM_is_busy
  *
  * DESCRIPTION:
  *  Determines if an instance is currently busy with a task.
@@ -6461,12 +6565,12 @@ bool EEPROMI2C_service(EEPROMI2C_instance_t* instance);
  *
  ******************************************************************************/
 
-bool EEPROMI2C_is_busy(EEPROMI2C_instance_t* instance);
+bool EEPROM_is_busy(EEPROM_instance_t* instance);
 
 #ifdef __cplusplus
 }
 #endif
-#endif // EEPROMI2C_J_H
+#endif // EEPROM_J_H
 
 /*******************************************************************************
  *
@@ -9918,7 +10022,7 @@ typedef void (*NVMBASIC_post_task_callback_t)(uint32_t);
  *  Module flags.
  *
  * eeprom
- *  User-provided initialized instance of a EEPROMI2C.
+ *  User-provided initialized instance of a EEPROM.
  *
  * bus_mutex
  *  User-provided initialized instance of a BUSMUTEX.
@@ -9980,7 +10084,7 @@ typedef void (*NVMBASIC_post_task_callback_t)(uint32_t);
 typedef struct
 {
   NVMBASIC_flags_t flags;
-  EEPROMI2C_instance_t* eeprom;
+  EEPROM_instance_t* eeprom;
   BUSMUTEX_instance_t* bus_mutex;
   BUSMUTEX_bus_id_t bus_id;
   uint8_t* data_stable;
@@ -10012,7 +10116,7 @@ NVMBASIC_instance_t;
  ******************************************************************************/
 
 void NVMBASIC_initialize(NVMBASIC_instance_t* instance,
-                         EEPROMI2C_instance_t* eeprom,
+                         EEPROM_instance_t* eeprom,
                          BUSMUTEX_instance_t* bus_mutex,
                          BUSMUTEX_bus_id_t bus_id,
                          uint8_t* data_stable,
