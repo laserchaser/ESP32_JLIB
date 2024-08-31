@@ -7842,6 +7842,12 @@ void GFX2D_draw_char(GFX2D_instance_t* instance, uint8_t c);
 extern "C" {
 #endif
 
+/*
+ * The default timeout for chip select and unselect.
+ */
+
+#define ILI9341_CHIP_SELECT_TIMEOUT_uS    100000U
+
 /*******************************************************************************
  *
  * ILI9341_custom_command_t
@@ -7898,8 +7904,7 @@ typedef union
     uint8_t dma_busy                      : 1;
     uint8_t reg_write                     : 1;
     uint8_t single_segment                : 1;
-    uint8_t task_state                    : 3;
-    uint8_t reserved7                     : 1;
+    uint8_t task_state                    : 4;
   };
 }
 ILI9341_flags_t;
@@ -7989,22 +7994,27 @@ typedef void (*ILI9341_post_task_callback_t)(uint32_t);
 
 /*******************************************************************************
  *
- * ILI9341_hal_set_cable_select_t
+ * ILI9341_hal_set_chip_select_t
  *
  * DESCRIPTION:
  *  Hardware abstraction layer function template for a user-provided function
- *  which will enable or disable the device cable select.
+ *  which will enable or disable the device chip select. A boolean return is
+ *  provided to allow more iteration time to select/unselect the chip. This
+ *  function will continue to be called until true is returned.
  *
  * PARAMETERS:
  *  enable
  *   True to select the device, else, false.
+ *
+ * RETURN:
+ *  True if the chip selection was completed, else, false.
  *
  * NOTES:
  *  Can be initialized as NULL - NO
  *
  ******************************************************************************/
 
-typedef void (*ILI9341_hal_set_cable_select_t)(bool);
+typedef bool (*ILI9341_hal_set_chip_select_t)(bool);
 
 /*******************************************************************************
  *
@@ -8020,6 +8030,13 @@ typedef void (*ILI9341_hal_set_cable_select_t)(bool);
  *
  * NOTES:
  *  Can be initialized as NULL - NO
+ *
+ *  I had considered making this a boolean return to allow "slow" setting of
+ *  the data/command select, but ultimately decided against it. While the
+ *  chip select is only triggered at the start and end of a transaction, the
+ *  DC is triggered throughout the transaction - it really should have a GPIO,
+ *  or something equivalent, assigned to drive it.
+ *
  *
  ******************************************************************************/
 
@@ -8120,6 +8137,11 @@ typedef void (*ILI9341_hal_disable_dma_t)(void);
  * reg_length
  *  Length of the reg_buffer.
  *
+ * chip_select_timeout_us
+ *  The time allowed for the chip select to complete before aborting. The value
+ *  is initialized to the defined default, but can be directly modified by the
+ *  user.
+ *
  * dma_bytes_per_transfer
  *  The maximum number of bytes which can be sent in a single DMA transaction.
  *
@@ -8173,6 +8195,7 @@ typedef struct
   uint8_t reg_address;
   void* reg_buffer;
   uint32_t reg_length;
+  uint32_t chip_select_timeout_us;
   uint32_t dma_bytes_per_transfer;
   uint32_t dma_transfer_timeout_us;
   uint32_t dma_transfer_counter;
@@ -8184,7 +8207,7 @@ typedef struct
   ILI9341_draw_handler_t draw_handler;
   ILI9341_pre_task_callback_t pre_task_callback;
   ILI9341_post_task_callback_t post_task_callback;
-  ILI9341_hal_set_cable_select_t set_cable_select;
+  ILI9341_hal_set_chip_select_t set_chip_select;
   ILI9341_hal_set_dc_select_t set_dc_select;
   ILI9341_hal_configure_dma_t configure_dma;
   ILI9341_hal_disable_dma_t disable_dma;
@@ -8231,7 +8254,7 @@ void ILI9341_initialize(ILI9341_instance_t* instance,
                         ILI9341_draw_handler_t draw_handler,
                         ILI9341_pre_task_callback_t pre_task_callback,
                         ILI9341_post_task_callback_t post_task_callback,
-                        ILI9341_hal_set_cable_select_t set_cable_select,
+                        ILI9341_hal_set_chip_select_t set_chip_select,
                         ILI9341_hal_set_dc_select_t set_dc_select,
                         ILI9341_hal_configure_dma_t configure_dma,
                         ILI9341_hal_disable_dma_t disable_dma);
@@ -12673,6 +12696,7 @@ void UTILITIES_dummy_void_void(void);
 void UTILITIES_dummy_void_bool(bool b);
 bool UTILITIES_dummy_false_void(void);
 bool UTILITIES_dummy_true_void(void);
+bool UTILITIES_dummy_true_bool(bool b);
 bool UTILITIES_dummy_false_voidp_u32(void* voidp, uint32_t u32) ;
 uint32_t UTILITIES_dummy_u32_void(void);
 void UTILITIES_dummy_void_u32(uint32_t u32);
@@ -12779,6 +12803,12 @@ extern const uint8_t WEB_BOOTSTRAP_CSS[];
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/*
+ * The default timeout for chip select and unselect.
+ */
+
+#define WS2812_CHIP_SELECT_TIMEOUT_uS     100000U
 
 /*
  * The number of bytes required to hold the 24-bit value of a single GRB LED.
@@ -12892,6 +12922,34 @@ typedef void (*WS2812_post_task_callback_t)(uint32_t);
 
 /*******************************************************************************
  *
+ * WS2812_hal_set_chip_select_t
+ *
+ * DESCRIPTION:
+ *  Hardware abstraction layer function template for a user-provided function
+ *  which will enable or disable the device chip select. A boolean return is
+ *  provided to allow more iteration time to select/unselect the chip. This
+ *  function will continue to be called until true is returned.
+ *
+ *  A direct communication with WS2812 will likely not require a CS. However,
+ *  if they share the SPI bus with other devices, an AND gate may be used along
+ *  with CS to properly select which device is active.
+ *
+ * PARAMETERS:
+ *  enable
+ *   True to select the device, else, false.
+ *
+ * RETURN:
+ *  True if the chip selection was completed, else, false.
+ *
+ * NOTES:
+ *  Can be initialized as NULL - YES
+ *
+ ******************************************************************************/
+
+typedef bool (*WS2812_hal_set_chip_select_t)(bool);
+
+/*******************************************************************************
+ *
  * WS2812_hal_configure_dma_t
  *
  * DESCRIPTION:
@@ -12952,6 +13010,10 @@ typedef void (*WS2812_hal_disable_dma_t)(void);
  * utimer_ticket
  *  Data structure used with the UTIMER instance.
  *
+ * utimer_ticket_cs
+ *  Additional utimer ticked specifically for chip select. This is needed to
+ *  accomodate simultaneous timeouts.
+ *
  * bus_mutex
  *  User-provided initialized instance of a BUSMUTEX.
  *
@@ -12964,16 +13026,21 @@ typedef void (*WS2812_hal_disable_dma_t)(void);
  * src_buffer_length
  *  Length of the source buffer in bytes. Each GRB LED will require 9-bytes.
  *
+ * chip_select_timeout_us
+ *  The time allowed for the chip select to complete before aborting. The value
+ *  is initialized to the defined default, but can be directly modified by the
+ *  user.
+ *
  * dma_bytes_per_transfer
  *  The maximum number of bytes which can be sent in a single DMA transaction.
  *
  * dma_transfer_timeout_us
  *  The time allowed for the DMA transfer to complete before aborting.
  *
- * dma_byte_transfer_counter
+ * dma_transfer_counter
  *  The number of bytes which have been transferred by the DMA.
  *
- * dma_byte_transfer_count
+ * dma_transfer_count
  *  The total number of bytes which need to be transferred by the DMA.
  *
  * dma_transfer_last_packet_length
@@ -13005,14 +13072,16 @@ typedef struct
   UTIMER_instance_t* utimer;
   SERSPI_instance_t* spi;
   UTIMER_ticket_t utimer_ticket;
+  UTIMER_ticket_t utimer_ticket_cs;
   BUSMUTEX_instance_t* bus_mutex;
   BUSMUTEX_bus_id_t bus_id;
   uint8_t* src_buffer;
   uint32_t src_buffer_length;
+  uint32_t chip_select_timeout_us;
   uint32_t dma_bytes_per_transfer;
   uint32_t dma_transfer_timeout_us;
-  uint32_t dma_byte_transfer_counter;
-  uint32_t dma_byte_transfer_count;
+  uint32_t dma_transfer_counter;
+  uint32_t dma_transfer_count;
   uint32_t dma_transfer_last_packet_length;
   uint32_t dma_src_buffer_offset;
   uint8_t bit_code_0;
@@ -13020,6 +13089,7 @@ typedef struct
   uint32_t callback_context;
   WS2812_pre_task_callback_t pre_task_callback;
   WS2812_post_task_callback_t post_task_callback;
+  WS2812_hal_set_chip_select_t set_chip_select;
   WS2812_hal_configure_dma_t configure_dma;
   WS2812_hal_disable_dma_t disable_dma;
 }
@@ -13066,6 +13136,7 @@ void WS2812_initialize(WS2812_instance_t* instance,
                        bool invert_bits,
                        WS2812_pre_task_callback_t pre_task_callback,
                        WS2812_post_task_callback_t post_task_callback,
+                       WS2812_hal_set_chip_select_t set_chip_select,
                        WS2812_hal_configure_dma_t configure_dma,
                        WS2812_hal_disable_dma_t disable_dma);
 
@@ -13126,8 +13197,8 @@ void WS2812_parse_rgb_instance(WS2812_instance_t* instance, RGB_instance_t* rgb)
  * PARAMETERS:
  *  grb_array
  *   Pointer to a user-provided byte-array. The array NEEDs to be of a length
- *   divisible by 3. The first element is the Red intensity, the second the
- *   Green intensity, and the third the Blue intensity. This pattern is
+ *   divisible by 3. The first element is the Green intensity, the second the
+ *   Red intensity, and the third the Blue intensity. This pattern is
  *   repeated for the duration of the array.
  *
  *  grb_array_length
